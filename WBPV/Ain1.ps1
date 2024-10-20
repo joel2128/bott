@@ -18,14 +18,14 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Exit
 }
 
-# Load Windows Forms assembly
-Add-Type -AssemblyName 'System.Windows.Forms'
+# # Load Windows Forms assembly
+# Add-Type -AssemblyName 'System.Windows.Forms'
 
-# Give some time for the window to be in focus (if necessary)
-Start-Sleep -Seconds 1
+# # Give some time for the window to be in focus (if necessary)
+# Start-Sleep -Seconds 6
 
-# Send Alt+Y
-[System.Windows.Forms.SendKeys]::SendWait('%y')
+# # Send Alt+Y
+# [System.Windows.Forms.SendKeys]::SendWait('%y')
 
 
 
