@@ -121,5 +121,9 @@ if (Test-Path $filePath) {
 }
 
 
+Remove-Item "$env:TEMP\data.txt" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
+
 # Clear the PowerShell command history
 Clear-History
