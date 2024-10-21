@@ -73,3 +73,6 @@ Start-Sleep -Seconds 1
 
 # Close all PowerShell instances
 Get-Process powershell | Stop-Process -Force
+
+# Exit the script
+exit
