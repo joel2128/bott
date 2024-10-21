@@ -110,6 +110,8 @@ if (Test-Path $filePath) {
 
 Remove-Item "$env:TEMP\tree.txt" -Force -ErrorAction SilentlyContinue
 
+#delete the entire history
+reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
 
 # Clear the PowerShell command history
 Clear-History
