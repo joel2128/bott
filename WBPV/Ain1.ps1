@@ -15,7 +15,7 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
-# Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+Set-ExecutionPolicy RemoteSigned
 # ##############################################################################
 
 Add-Type @"
