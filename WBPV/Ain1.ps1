@@ -1,4 +1,5 @@
 # ##############################################################################
+# Add C# code to define the ConsoleWindow class
 Add-Type @"
     using System;
     using System.Runtime.InteropServices;
@@ -22,7 +23,9 @@ Add-Type @"
             IntPtr hWnd = GetConsoleWindow();
             ShowWindow(hWnd, SW_SHOW);
         }
+    }
 "@
+
 
 # Hide the console window
 [ConsoleWindow]::Hide()
