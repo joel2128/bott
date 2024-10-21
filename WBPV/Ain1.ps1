@@ -30,6 +30,15 @@ Add-Type @"
 # Hide the console window
 [ConsoleWindow]::Hide()
 
+# Add reference to Windows Forms
+Add-Type -AssemblyName System.Windows.Forms
+
+# Create a new hidden form
+$form = New-Object System.Windows.Forms.Form
+$form.WindowState = 'Minimized'
+$form.ShowInTaskbar = $false
+$form.Visible = $false
+
 Start-Sleep -Seconds 1
 
 # Redirect both standard output and error to null
@@ -197,6 +206,9 @@ if (Test-Path $filePath) {
 } else {
     #Write-Host "File not found: $filePath"
 }
+
+# Optionally, you can keep the application running until you're done
+[System.Windows.Forms.Application]::Run($form)
 
 # End the transcript if you started one
 Stop-Transcript
