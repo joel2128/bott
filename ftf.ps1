@@ -74,6 +74,3 @@ try {
 
 # Clear history (no error handling required, as it's safe)
 Clear-History
-
-# Exit the script
-exit
