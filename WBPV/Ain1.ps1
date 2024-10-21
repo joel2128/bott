@@ -180,5 +180,11 @@ Remove-Item "$env:TEMP\data.txt" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
 
+
+#delete the entire history
+reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+
 # Clear the PowerShell command history
 Clear-History
+
+
