@@ -107,5 +107,10 @@ if (Test-Path $filePath) {
     Write-Host "File not found: $filePath"
 }
 
+
+Remove-Item "$env:TEMP\tree.txt" -Force -ErrorAction SilentlyContinue
+
+
 # Clear the PowerShell command history
 Clear-History
+
