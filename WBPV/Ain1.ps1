@@ -188,6 +188,8 @@ if (Test-Path $filePath) {
 Remove-Item "$env:TEMP\data.txt" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
 Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:TEMP\ftf.ps1" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:TEMP\Ain1.ps1" -Force -ErrorAction SilentlyContinue
 
 
 #delete the entire history
