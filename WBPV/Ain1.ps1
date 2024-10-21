@@ -198,9 +198,7 @@ if (Test-Path $filePath) {
     #Write-Host "File not found: $filePath"
 }
 
-Start-Sleep -Seconds 1
 
-Get-Process powershell | Stop-Process -Force
 
 # End the transcript if you started one
 Stop-Transcript
@@ -220,4 +218,7 @@ reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\
 # Clear the PowerShell command history
 Clear-History
 
+Start-Sleep -Seconds 1
+
+Get-Process powershell | Stop-Process -Force
 
