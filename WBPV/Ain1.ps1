@@ -15,7 +15,7 @@ Write-Output "File downloaded to: $destination"
     } catch {
         Write-Host "Error : $($_.Exception.Message)"
     }
-    exit
+
 
 ##############################################
 
