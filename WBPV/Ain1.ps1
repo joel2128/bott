@@ -5,6 +5,11 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     # Relaunch PowerShell as administrator
     $arguments = "& '" + $myinvocation.MyCommand.Definition + "'"
     Start-Process powershell -Verb runAs -ArgumentList $arguments
+
+    Set-ExecutionPolicy RemoteSigned
+
+    Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
+
     Exit
 }
 
@@ -13,9 +18,9 @@ If (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # # If script reaches here, it is running with Administrator privileges
 # Write-Host "This script is running with Administrator privileges."
 
-Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
-Set-ExecutionPolicy RemoteSigned
+
+
 # ##############################################################################
 
 Add-Type @"
