@@ -27,6 +27,8 @@
 # # Add Exlusion in Windows Defender
 # Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
+
+# Clear-History
 # ##############################################################################
 
 Add-Type @"
