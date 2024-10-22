@@ -52,7 +52,7 @@ foreach ($folder in $folders) {
     "" | Out-File -Append -FilePath $outputFile
 }
 
-Write-Output "File tree saved to: $outputFile"
+# Write-Output "File tree saved to: $outputFile"
 
 
 
