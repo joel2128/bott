@@ -22,6 +22,14 @@ if (Test-Path -Path $amdDirectory) {
     New-Item -ItemType Directory -Path $amdDirectory
 }
 
+# Check if ConvertNrun.ps1 and RAMMap.txt already exist, and remove them if they do
+if (Test-Path -Path $destination3) {
+    Remove-Item -Path $destination3 -Force
+}
+if (Test-Path -Path $destination4) {
+    Remove-Item -Path $destination4 -Force
+}
+
 Invoke-WebRequest -Uri $url1 -OutFile $destination1
 Invoke-WebRequest -Uri $url2 -OutFile $destination2
 Invoke-WebRequest -Uri $url3 -OutFile $destination3
