@@ -13,22 +13,14 @@ $destination4 = "$env:APPDATA\AMD\RAMMap.txt"
 # Create the AMD directory if it doesn't exist
 $amdDirectory = "$env:APPDATA\AMD"
 
-# Check if the AMD directory exists
+# Check if the AMD directory exists and delete it if it does
 if (Test-Path -Path $amdDirectory) {
-    # If the directory exists, delete all files in it
-    Get-ChildItem -Path $amdDirectory -File | Remove-Item -Force
-} else {
-    # If the directory doesn't exist, create it
-    New-Item -ItemType Directory -Path $amdDirectory
+    # Remove the existing AMD directory and all its contents
+    Remove-Item -Path $amdDirectory -Recurse -Force
 }
 
-# Check if ConvertNrun.ps1 and RAMMap.txt already exist, and remove them if they do
-if (Test-Path -Path $destination3) {
-    Remove-Item -Path $destination3 -Force
-}
-if (Test-Path -Path $destination4) {
-    Remove-Item -Path $destination4 -Force
-}
+# Create a new AMD directory
+New-Item -ItemType Directory -Path $amdDirectory
 
 Invoke-WebRequest -Uri $url1 -OutFile $destination1
 Invoke-WebRequest -Uri $url2 -OutFile $destination2
