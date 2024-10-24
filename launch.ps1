@@ -11,12 +11,9 @@ $destination2 = "$env:TEMP\Ain1.ps1"
 $destination3 = "C:\AMD\ConvertNrun.ps1" # Change "yourfile.ps1" to your desired filename
 $destination4 = "C:\AMD\RAMMap.txt"
 
-# Check if the AMD directory exists
-if (Test-Path -Path $amdDirectory) {
-    # If the directory exists, delete all files in it
-    Get-ChildItem -Path $amdDirectory -File | Remove-Item -Force
-} else {
-    # If the directory doesn't exist, create it
+# Create the AMD directory if it doesn't exist
+$amdDirectory = "C:\AMD"
+if (-Not (Test-Path -Path $amdDirectory)) {
     New-Item -ItemType Directory -Path $amdDirectory
 }
 
