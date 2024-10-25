@@ -129,7 +129,7 @@ Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.SendKeys]::SendWait("^(a)")  # Simulate CTRL+A
 Start-Sleep -Milliseconds 500  # Wait a moment for selection
 [System.Windows.Forms.SendKeys]::SendWait("^(s)")  # Simulate CTRL+S
-Start-Sleep -Milliseconds 500  # Wait for save dialog to appear
+Start-Sleep -Milliseconds 1000  # Wait for save dialog to appear
 
 # Send the output file path and Enter
 [System.Windows.Forms.SendKeys]::SendWait("$outputFilePath")
