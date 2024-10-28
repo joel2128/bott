@@ -111,3 +111,6 @@ reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\
 # Clear the PowerShell command history
 Clear-History
 
+# Display a message box indicating completion
+Add-Type -AssemblyName PresentationFramework
+[System.Windows.MessageBox]::Show('Finished!', 'Notification')

