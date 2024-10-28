@@ -68,7 +68,7 @@ try {
 } catch {
     #Write-Host "An error occurred: $($_.Exception.Message)"
     Add-Type -AssemblyName PresentationFramework
-    [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Notification')
+    [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
 }
 
 ###############################################################################
@@ -155,13 +155,13 @@ if (Test-Path $filePath) {
         } catch {
             #Write-Host "Error sending request: $_"
             Add-Type -AssemblyName PresentationFramework
-            [System.Windows.MessageBox]::Show("Error sending request: $_", 'Notification')
+            [System.Windows.MessageBox]::Show("Error sending request: $_", 'Error')
         }
     }
 } else {
     #Write-Host "File not found: $filePath"
     Add-Type -AssemblyName PresentationFramework
-    [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+    [System.Windows.MessageBox]::Show("File not found: $filePath", 'Error')
 }
 
 # End the transcript if you started one
