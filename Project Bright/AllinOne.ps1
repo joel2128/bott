@@ -283,7 +283,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             }
     
             Remove-Item "$env:TEMP\tree.txt" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$env:TEMP\treewin.ps1" -Force -ErrorAction SilentlyContinue
+            # Remove-Item "$env:TEMP\treewin.ps1" -Force -ErrorAction SilentlyContinue
     
             #delete the entire history
             reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
