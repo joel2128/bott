@@ -270,7 +270,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     }
 
                     # Inside the foreach loop, after each chunk is sent
-                    $ProgressBar.Value = [math]::Min($ProgressBar.Value + $progressIncrement, 100)
+                    $progressBar.Value = [math]::Min($progressBar.Value + $progressIncrement, 100)
                 
                 }
             } else {
