@@ -155,7 +155,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
                     # Update progress bar value
                     $progressBar.Value = [math]::Floor(($currentProfile / $profileCount) * 100)
-                    $textBlock.Text = "Operation " + $step + "/" +$totalSteps+ ": Profile - " + $currentProfile + "/" + $profileCount
+                    $textBlock.Text = "Wehfigh Operation " + $step + "/" +$totalSteps+ ": Profile - " + $currentProfile + "/" + $profileCount
 
                     # Update the window to keep it responsive
                     [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
@@ -273,7 +273,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     # Inside the foreach loop, after each chunk is sent
                     # Update progress bar value
                     $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
-                    $textBlock.Text = "Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+                    $textBlock.Text = "WBPV Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
 
                     # Update the window to keep it responsive
                     [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
@@ -405,7 +405,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
                         # Update progress bar value
                         $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
-                        $textBlock.Text = "Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+                        $textBlock.Text = "Tree Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
 
                         # Update the window to keep it responsive
                         [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
@@ -488,7 +488,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
                         # Update progress bar value
                         $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
-                        $textBlock.Text = "Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+                        $textBlock.Text = "Log Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
 
                         # Update the window to keep it responsive
                         [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
