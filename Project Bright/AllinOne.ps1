@@ -155,7 +155,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
                     # Update progress bar value
                     $progressBar.Value = [math]::Floor(($currentProfile / $profileCount) * 100)
-                    $textBlock.Text = "Operation 1: Profile - " + $currentProfile + "/" + $profileCount
+                    $textBlock.Text = "Operation " + $step + "/" +$totalSteps+ ": Profile - " + $currentProfile + "/" + $profileCount
 
                     # Update the window to keep it responsive
                     [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
@@ -291,11 +291,11 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
             Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
             Remove-Item "$env:TEMP\Cred.ps1" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
+            #Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
             $textBlock.Text = "Done operation 4..."
             $textBlock.Text = "Starting last operation ..."
-            # Write-Output "Completed Operation 4 - CRED done"
+            Write-Output "Completed Operation 4 - CRED done"
         }
         5 {
             #Operation 5 - TREE Files Extract
