@@ -171,9 +171,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 # Add-Type -AssemblyName PresentationFramework
                 # [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
-            $textBlock.Text = "Extracted!"
-            # $textBlock.Text = "Starting operation 2..."
-            Write-Output "Completed Operation 1 - NETSH"
+            $textBlock.Text = "Done Operation " + $step
+            $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps
+
+            Write-Output "Completed Operation " + $step + " - NETSH"
         }
         1 {
             # Operation 2
