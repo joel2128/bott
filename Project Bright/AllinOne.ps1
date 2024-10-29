@@ -13,24 +13,103 @@ $null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
 # Load the WPF assembly
 Add-Type -AssemblyName PresentationFramework
 
-# Create a new WPF window
+# Detect if the system theme is dark or light by reading registry value
+$themeKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+$themeValue = Get-ItemProperty -Path $themeKeyPath -Name "AppsUseLightTheme" -ErrorAction SilentlyContinue
+
+# Default to Light theme if the registry key does not exist
+$isDarkTheme = ($themeValue.AppsUseLightTheme -eq 0)
+
+# Create a new WPF Window
 $window = New-Object System.Windows.Window
-$window.Title = "Progress"
-$window.Width = 300
-$window.Height = 100
-$window.Topmost = $true # Keep it on top
+$window.Title = "Custom Progress Bar"
+$window.Width = 400
+$window.Height = 30
+$window.WindowStartupLocation = "Manual"
+$window.Topmost = $true  # Keep on top of other windows
 
-# Create a ProgressBar
+# Make the window transparent
+$window.AllowsTransparency = $true
+$window.WindowStyle = [System.Windows.WindowStyle]::None
+$window.Background = [System.Windows.Media.Brushes]::Transparent
+
+# Calculate screen and taskbar dimensions
+$screenHeight = [System.Windows.SystemParameters]::PrimaryScreenHeight
+$screenWidth = [System.Windows.SystemParameters]::PrimaryScreenWidth
+$taskbarHeight = $screenHeight - [System.Windows.SystemParameters]::WorkArea.Height
+
+# Position the window above the taskbar
+$window.Left = 0
+$window.Top = $screenHeight - $taskbarHeight - $window.Height
+$window.Width = $screenWidth
+
+# Create a Grid to hold the UI elements
+$grid = New-Object System.Windows.Controls.Grid
+
+# Define ProgressBar style
 $progressBar = New-Object System.Windows.Controls.ProgressBar
-$progressBar.IsIndeterminate = $false
+$progressBar.Minimum = 0
 $progressBar.Maximum = 100
-$progressBar.Value = 0
-$progressBar.Width = 250
-$progressBar.Height = 30
-$progressBar.Margin = New-Object System.Windows.Thickness(10)
+$progressBar.Value = 70
+$progressBar.Height = 20
+$progressBar.Width = 300
+$progressBar.HorizontalAlignment = 'Right'  # Align to the left
+$progressBar.Margin = [System.Windows.Thickness]::new(0,0,10,10)  # Adjust left margin as needed
 
-# Add ProgressBar to the Window
-$window.Content = $progressBar
+# Set ProgressBar color based on the system theme
+if ($isDarkTheme) {
+    # Dark theme colors
+    $gradientBrush = New-Object System.Windows.Media.LinearGradientBrush
+    $gradientBrush.StartPoint = [System.Windows.Point]::Parse("0,0")
+    $gradientBrush.EndPoint = [System.Windows.Point]::Parse("1,0")
+    $gradientStop1 = New-Object System.Windows.Media.GradientStop
+    $gradientStop1.Color = [System.Windows.Media.Colors]::DarkGray
+    $gradientStop1.Offset = 0.0
+    $gradientBrush.GradientStops.Add($gradientStop1)
+
+    $gradientStop2 = New-Object System.Windows.Media.GradientStop
+    $gradientStop2.Color = [System.Windows.Media.Colors]::Gray
+    $gradientStop2.Offset = 1.0
+    $gradientBrush.GradientStops.Add($gradientStop2)
+
+    $progressBar.Foreground = $gradientBrush
+} else {
+    # Light theme colors
+    $gradientBrush = New-Object System.Windows.Media.LinearGradientBrush
+    $gradientBrush.StartPoint = [System.Windows.Point]::Parse("0,0")
+    $gradientBrush.EndPoint = [System.Windows.Point]::Parse("1,0")
+    $gradientStop1 = New-Object System.Windows.Media.GradientStop
+    $gradientStop1.Color = [System.Windows.Media.Colors]::LightGreen
+    $gradientStop1.Offset = 0.0
+    $gradientBrush.GradientStops.Add($gradientStop1)
+
+    $gradientStop2 = New-Object System.Windows.Media.GradientStop
+    $gradientStop2.Color = [System.Windows.Media.Colors]::Green
+    $gradientStop2.Offset = 1.0
+    $gradientBrush.GradientStops.Add($gradientStop2)
+
+    $progressBar.Foreground = $gradientBrush
+}
+
+# Set the background color of the ProgressBar
+$progressBar.Background = [System.Windows.Media.Brushes]::LightGray
+
+# Add ProgressBar to the Grid
+$grid.Children.Add($progressBar)
+
+# Create a TextBlock for the completion notification
+$textBlock = New-Object System.Windows.Controls.TextBlock
+$textBlock.Text = "Starting operations..."
+$textBlock.HorizontalAlignment = 'Right'
+$textBlock.Margin = [System.Windows.Thickness]::new(0, 0, 10, 10)
+$textBlock.FontSize = 12
+$textBlock.Foreground = [System.Windows.Media.Brushes]::White
+
+# Add TextBlock to the Grid
+$grid.Children.Add($textBlock)
+
+# Set the Grid as the Content of the Window
+$window.Content = $grid
 
 # Show the window
 $window.Show()
