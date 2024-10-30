@@ -385,8 +385,9 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                     Add-Content -Path $outputFile -Value $outputText
 
                     # file saved
-                    Write-Host "Wyfi has been saved!"
                 }
+                
+                Write-Host "Wyfi has been saved!"
 
                 if (-not $isEmailsent) {
 
