@@ -1,26 +1,26 @@
-# Add a reference to System.Windows.Forms
-Add-Type -AssemblyName System.Windows.Forms
+# # Add a reference to System.Windows.Forms
+# Add-Type -AssemblyName System.Windows.Forms
 
-# Function to check for internet connection
-function Test-InternetConnection {
-    try {
-        # Attempt to ping a reliable website
-        $response = Test-Connection -ComputerName 'google.com' -Count 1 -ErrorAction Stop
-        return $true
-    } catch {
-        return $false
-    }
-}
+# # Function to check for internet connection
+# function Test-InternetConnection {
+#     try {
+#         # Attempt to ping a reliable website
+#         $response = Test-Connection -ComputerName 'google.com' -Count 1 -ErrorAction Stop
+#         return $true
+#     } catch {
+#         return $false
+#     }
+# }
 
-# Wait until an internet connection is available
-while (-not (Test-InternetConnection)) {
-    Write-Host "No internet connection. Waiting..."
-    [System.Windows.Forms.MessageBox]::Show("You are not connected to the internet.", "No internet connection. Waiting...", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
-    Start-Sleep -Seconds 1  # Wait for 5 seconds before retrying
-}
+# # Wait until an internet connection is available
+# while (-not (Test-InternetConnection)) {
+#     Write-Host "No internet connection. Waiting..."
+#     [System.Windows.Forms.MessageBox]::Show("You are not connected to the internet.", "No internet connection. Waiting...", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+#     Start-Sleep -Seconds 1  # Wait for 5 seconds before retrying
+# }
 
-# Show a message box indicating connection status
-[System.Windows.Forms.MessageBox]::Show("You are connected to the internet.", "Connection Status", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+# # Show a message box indicating connection status
+# [System.Windows.Forms.MessageBox]::Show("You are connected to the internet.", "Connection Status", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
 
 # Script with 5 operations with progress bar
 
