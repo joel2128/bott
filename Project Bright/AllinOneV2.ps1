@@ -202,7 +202,7 @@ function Send-ZohoEmail {
     try {
         Write-Host "Sending Email.... please wait..."
         $smtpClient.Send($mailMessage)
-        Write-Host "Email sent successfully to $ToEmail." + $Subject
+        # Write-Host "Email sent successfully to $ToEmail." + $Subject
         $message = "Email sent successfully to $toEmail. " + $Subject
         # Send the webhook notification
         Send-EmailNotification -ToEmail $toEmail -WebhookUrl $email_webhookUrl -Message $message
@@ -733,5 +733,38 @@ Stop-Transcript
 # Final output (if needed)
 Write-Output "All operations completed!"
 # Display a message box indicating completion
-Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("All operations completed!", "Success", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
+
+public class AutoClosingMessageBox {
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    private static extern int SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+    private const int WM_CLOSE = 0x0010;
+
+    public static void Show(string text, string caption, int timeout) {
+        Thread thread = new Thread(() => {
+            Thread.Sleep(timeout);
+            IntPtr hWnd = FindWindow(null, caption);
+            if (hWnd != IntPtr.Zero) {
+                SendMessage(hWnd, WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
+            }
+        });
+        thread.Start();
+        System.Windows.MessageBox.Show(text, caption, System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+    }
+}
+"@
+
+# Show the message box with a 1-second timeout (1000 milliseconds)
+[AutoClosingMessageBox]::Show("All operations completed!", "Success", 1000)
+
+
+# Add-Type -AssemblyName PresentationFramework
+# [System.Windows.MessageBox]::Show("All operations completed!", "Success", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
