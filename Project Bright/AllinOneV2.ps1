@@ -704,8 +704,8 @@ for ($step = 1; $step -le $totalSteps; $step++) {
                 }
             }
             $textBlock.Text = "Log sent!"
-            Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$env:TEMP\Ain1_log_copy.txt" -Force -ErrorAction SilentlyContinue
+            # Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
+            # Remove-Item "$env:TEMP\Ain1_log_copy.txt" -Force -ErrorAction SilentlyContinue
 
 
             #delete the entire history
@@ -733,6 +733,9 @@ Stop-Transcript
 # Final output (if needed)
 Write-Output "All operations completed!"
 # Display a message box indicating completion
+
+Remove-Item "$env:TEMP\Ain1_log.txt" -Force -ErrorAction SilentlyContinue
+Remove-Item "$env:TEMP\Ain1_log_copy.txt" -Force -ErrorAction SilentlyContinue
 
 Add-Type -TypeDefinition @"
 using System;
